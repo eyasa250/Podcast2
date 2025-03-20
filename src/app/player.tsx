@@ -10,6 +10,7 @@ import { useTrackPlayerFavorite } from '@/hooks/useTrackPlayerFavorite'
 import { defaultStyles, utilsStyles } from '@/styles'
 import { FontAwesome } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
+import { useEffect } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -30,7 +31,9 @@ const PlayerScreen = () => {
 			</View>
 		)
 	}
-
+	useEffect(() => {
+        console.log("Active Track:", activeTrack)
+    }, [activeTrack])
 	return (
 		<LinearGradient
 			style={{ flex: 1 }}
