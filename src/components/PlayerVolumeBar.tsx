@@ -1,4 +1,4 @@
-import { colors } from '@/constants/tokens'
+import { colors } from '@/core/theme'
 import { useTrackPlayerVolume } from '@/hooks/useTrackPlayerVolume'
 import { utilsStyles } from '@/styles'
 import { Ionicons } from '@expo/vector-icons'

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { login, register } from "@/services/authApi";
+import { login, register, getUserInfo } from "@/services/authApi";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null); // Stocke les infos utilisateur
   const router = useRouter();
 
   // Connexion
@@ -14,11 +15,8 @@ export const useAuth = () => {
     setError(null);
     try {
       const { access_token } = await login(email, password);
-      console.log("Réponse de l'API:", access_token);
-
       await AsyncStorage.setItem("auth_token", access_token);
-      const token = await AsyncStorage.getItem("auth_token");
-      console.log("Token stocké :", token);
+      await fetchUserInfo(); // Récupérer les infos de l'utilisateur après connexion
       router.replace("/(tabs)/home");
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion");
@@ -42,5 +40,24 @@ export const useAuth = () => {
     }
   };
 
-  return { signIn, signUp, loading, error };
+  // Récupérer les infos de l'utilisateur
+  const fetchUserInfo = async () => {
+    setLoading(true);
+    try {
+      const data = await getUserInfo();
+      setUser(data);
+      console.log(data);
+    } catch (err: any) {
+      console.error("Erreur lors de la récupération des infos utilisateur:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Charger les infos utilisateur au montage
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  return { signIn, signUp, user, fetchUserInfo, loading, error };
 };

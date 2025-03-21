@@ -3,9 +3,9 @@ import { FlatList, View, StyleSheet , Text} from 'react-native';
 import { TracksListItem } from './TracksListItem';
 import TrackPlayer, { Track } from 'react-native-track-player';
 import { defaultStyles, utilsStyles } from '@/styles';
-import { colors } from '@/constants/tokens';
 import FastImage from 'react-native-fast-image';
 import { unknownTrackImageUri } from '@/constants/images';
+import { colors } from '@/core/theme';
 
 export const TracksList = ({ data }: { data: Track[] }) => {
   const handleTrackSelect = async(track: Track) => {

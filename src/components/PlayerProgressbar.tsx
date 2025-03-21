@@ -1,4 +1,4 @@
- import { colors, fontSize } from '@/constants/tokens'
+import { colors, fontSize } from '@/core/theme'
 import { formatSecondsToMinutes } from '@/helpers/miscellaneous'
 import { defaultStyles, utilsStyles } from '@/styles'
 import { StyleSheet, Text, View, ViewProps } from 'react-native'

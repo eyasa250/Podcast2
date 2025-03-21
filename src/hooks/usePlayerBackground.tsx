@@ -1,7 +1,7 @@
+import { colors } from '@/core/theme'
 import { useEffect, useState, useRef } from 'react'
 import { getColors } from 'react-native-image-colors'
 import { IOSImageColors } from 'react-native-image-colors/build/types'
-import { colors } from '@/constants/tokens'
 
 export const usePlayerBackground = (imageUrl: string) => {
 	const [imageColors, setImageColors] = useState<IOSImageColors | null>(null)

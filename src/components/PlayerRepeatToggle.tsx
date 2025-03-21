@@ -1,4 +1,4 @@
-import { colors } from '@/constants/tokens'
+import { colors } from '@/core/theme'
 import { useTrackPlayerRepeatMode } from '@/hooks/useTrackPlayerRepeatMode'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { ComponentProps } from 'react'

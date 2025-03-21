@@ -4,7 +4,9 @@ import { PlayerProgressBar } from '@/components/PlayerProgressbar'
 import { PlayerRepeatToggle } from '@/components/PlayerRepeatToggle'
 import { PlayerVolumeBar } from '@/components/PlayerVolumeBar'
 import { unknownTrackImageUri } from '@/constants/images'
-import { colors, fontSize, screenPadding } from '@/constants/tokens'
+import theme from "@/core/theme";
+
+import { colors, fontSize, screenPadding } from '@/core/theme'
 import { usePlayerBackground } from '@/hooks/usePlayerBackground'
 import { useTrackPlayerFavorite } from '@/hooks/useTrackPlayerFavorite'
 import { defaultStyles, utilsStyles } from '@/styles'
