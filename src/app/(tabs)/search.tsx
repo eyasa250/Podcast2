@@ -1,44 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView, Text, ActivityIndicator } from "react-native";
 import { useSearchBar } from "@/hooks/useSearchBar";
-import library from "@/assets/library.json";
 import { TracksList } from "@/components/TracksList";
+import { usePodcasts } from "@/hooks/usePodcasts";
 
 const SearchScreen: React.FC = () => {
   const { search, SearchBarComponent } = useSearchBar();
-  const [filteredTracks, setFilteredTracks] = useState<any[]>([]);  // Initialise avec une liste vide de type any
+  const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
+  const { podcasts, loading, error } = usePodcasts();
 
-  // Met à jour les morceaux filtrés en fonction de la recherche
   useEffect(() => {
     if (search.length === 0) {
-      setFilteredTracks([]);  // Si la recherche est vide, ne montre rien
+      setFilteredTracks([]);
     } else {
-      const filtered = library.filter(
+      const filtered = podcasts.filter(
         (track) =>
-          track.title.toLowerCase().includes(search.toLowerCase()) ||
-          (track.artist && track.artist.toLowerCase().includes(search.toLowerCase()))
+          track?.title && track.title.toLowerCase().includes(search.toLowerCase()) ||
+          (track?.artist && track.artist.toLowerCase().includes(search.toLowerCase()))
       );
-      setFilteredTracks(filtered);  // Met à jour les morceaux filtrés
+      setFilteredTracks(filtered);
     }
-  }, [search]);
-
+  }, [search, podcasts]);
+  
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={{ paddingHorizontal: 10 }}
-      >
-        {SearchBarComponent}
-        {/* Utiliser TracksList avec les morceaux filtrés */}
-        {filteredTracks.length > 0 ? (
-          <TracksList data={filteredTracks} /> 
-           /* Passer filteredTracks */
-        ) : (
-          <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <Text style={{ fontSize: 18, color: 'gray' }}>No Podcasts found</Text>
-          </View>
-        )}
-      </ScrollView>
+    <View style={{ flex: 1, paddingHorizontal: 10 }}>
+      {SearchBarComponent}
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+      ) : error ? (
+        <Text style={{ textAlign: "center", color: "red", marginTop: 20 }}>{error}</Text>
+      ) : (
+        <ScrollView contentInsetAdjustmentBehavior="automatic">
+          {filteredTracks.length > 0 ? (
+            <TracksList data={filteredTracks} />
+          ) : (
+            <View style={{ alignItems: "center", marginTop: 40 }}>
+              <Text style={{ fontSize: 18, color: "gray" }}>No Podcasts found</Text>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 };

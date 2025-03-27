@@ -20,7 +20,9 @@ export const TracksListItem = ({
       underlayColor="#ddd" // Light grey effect when tapped
       style={styles.touchable} // Optional: Add extra styling if needed
     >
-      <Card style={[styles.card, isActiveTrack && styles.activeCard]}>
+      <Card style={[styles.card
+/*         , isActiveTrack && styles.activeCard
+ */        ]}>
         <Card.Cover source={{ uri: track.artwork || 'https://via.placeholder.com/150' }} style={styles.image} />
         <Card.Content>
           <Text style={styles.title}>{track.title}</Text>

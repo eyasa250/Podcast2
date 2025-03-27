@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Audio } from "expo-av";
 import { View, TouchableOpacity, Text } from "react-native";
 
@@ -6,15 +6,22 @@ export default function AudioPlayer({ source }: { source: string }) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync(); // Nettoyage du son lorsqu'on quitte le composant
+        }
+      : undefined;
+  }, [sound]);
+
   async function handlePlayPause() {
     if (sound) {
       if (isPlaying) {
         await sound.pauseAsync();
-        setIsPlaying(false);
       } else {
         await sound.playAsync();
-        setIsPlaying(true);
       }
+      setIsPlaying(!isPlaying);
     } else {
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: source },

@@ -32,6 +32,7 @@ const CustomSidebar: React.FC<DrawerContentComponentProps> = (props) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
+    
   },
   profileContainer: {
     padding: 20,

@@ -4,7 +4,7 @@ import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navig
 import { NavigationContainer } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import HomeScreen from '@/app';
-import ProfileScreen from '@/app/(tabs)/profile';
+import ProfileScreen from '@/app/profile';
 import CustomSidebar from '@/components/CustomSidebar';
 
 // Import des écrans et du composant custom

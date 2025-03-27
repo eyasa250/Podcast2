@@ -40,6 +40,7 @@
     "react-native-gesture-handler": "^2.24.0",
     "react-native-image-colors": "^2.4.0",
     "react-native-loader-kit": "^2.0.8",
+    "react-native-navigation-bar-color": "^2.0.2",
     "react-native-paper": "^5.13.1",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "^5.3.0",

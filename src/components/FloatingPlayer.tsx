@@ -59,11 +59,16 @@ const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#252525',
+		backgroundColor: '#FFFFFF', // Fond blanc au lieu de noir
 		padding: 8,
 		borderRadius: 12,
 		paddingVertical: 10,
 		position: 'relative',
+		shadowColor: '#000', // Ajout d'une ombre pour le contraste
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3, // Ombre pour Android
 	},
 	trackArtworkImage: {
 		width: 40,
@@ -80,6 +85,7 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: '600',
 		paddingLeft: 10,
+		color: '#252525', // Texte noir au lieu de blanc
 	},
 	trackControlsContainer: {
 		flexDirection: 'row',
@@ -93,7 +99,8 @@ const styles = StyleSheet.create({
 		top: 5,
 		right: 5,
 		padding: 4,
-		backgroundColor: 'rgba(255, 255, 255, 0.2)',
+		backgroundColor: 'rgba(0, 0, 0, 0.1)', // Bouton plus clair
 		borderRadius: 12,
 	},
 })
+
