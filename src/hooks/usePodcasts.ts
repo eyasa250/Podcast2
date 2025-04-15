@@ -25,7 +25,7 @@ export const usePodcasts = () => {
           url: podcast.audioUrl?.startsWith("http") ? podcast.audioUrl : `${API_BASE_URL}${podcast.audioUrl}`,
           title: podcast.title || "Titre inconnu",
           artist: podcast.channel?.name || "Artiste inconnu",
-          artwork: podcast.artwork || "https://via.placeholder.com/150", // Utilise l'image fournie si disponible
+          artwork: podcast.artwork /* || "https://via.placeholder.com/150" */, // Utilise l'image fournie si disponible
         }));
 
         setPodcasts(formattedData);

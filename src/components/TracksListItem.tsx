@@ -23,7 +23,7 @@ export const TracksListItem = ({
       <Card style={[styles.card
 /*         , isActiveTrack && styles.activeCard
  */        ]}>
-        <Card.Cover source={{ uri: track.artwork || 'https://via.placeholder.com/150' }} style={styles.image} />
+        <Card.Cover source={{ uri: track.artwork /* || 'https://via.placeholder.com/150'  */}} style={styles.image} />
         <Card.Content>
           <Text style={styles.title}>{track.title}</Text>
           <Text style={styles.artist}>{track.artist || 'Unknown Artist'}</Text>

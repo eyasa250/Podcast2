@@ -8,17 +8,23 @@ export const usePlayerBackground = (imageUrl: string) => {
 	const lastImageUrl = useRef<string | null>(null)
 
 	useEffect(() => {
-		// Vérifier si l'URL a changé avant de recalculer les couleurs
 		if (imageUrl && imageUrl !== lastImageUrl.current) {
-			lastImageUrl.current = imageUrl
-
-			getColors(imageUrl, {
-				fallback: colors.background,
-				cache: true,
-				key: imageUrl,
-			}).then((colors) => setImageColors(colors as IOSImageColors))
+		  console.log("URL Changed:", imageUrl);  // Ajout du log pour l'URL
+		  lastImageUrl.current = imageUrl;
+	  
+		  getColors(imageUrl, {
+			fallback: colors.background,
+			cache: true,
+			key: imageUrl,
+		  }).then((colors) => {
+			console.log("Colors fetched:", colors); // Ajout du log pour les couleurs récupérées
+			setImageColors(colors as IOSImageColors);
+		  }).catch(error => {
+			console.error("Error fetching colors:", error);  // Log d'erreur pour le cas où `getColors` échoue
+		  });
 		}
-	}, [imageUrl])
+	  }, [imageUrl]);
+	  
 
 	return { imageColors }
 }

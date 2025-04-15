@@ -63,7 +63,6 @@ export const CloseButton = ({ iconSize = 30, onPress }: PlayerButtonProps & { on
 		</TouchableOpacity>
 	)
 }
-
 const styles = StyleSheet.create({
 	container: {
 		width: '100%',
@@ -74,3 +73,4 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 })
+

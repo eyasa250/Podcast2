@@ -37,7 +37,7 @@ const theme = {
     primary: "#4C4C9D",
     secondary: "#1F2732",
     background: "#000",
-    text: "#2F2F2F",
+    text: "#2F2F2FFF",
     textMuted: "#9ca3af",
     icon: "#fff",
     maximumTrackTintColor: "rgba(255,255,255,0.4)",

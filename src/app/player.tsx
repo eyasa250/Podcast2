@@ -1,181 +1,161 @@
-import { MovingText } from '@/components/MovingText'
-import { PlayerControls } from '@/components/PlayerControls'
-import { PlayerProgressBar } from '@/components/PlayerProgressbar'
-import { PlayerRepeatToggle } from '@/components/PlayerRepeatToggle'
-import { PlayerVolumeBar } from '@/components/PlayerVolumeBar'
-import { unknownTrackImageUri } from '@/constants/images'
-import theme from "@/core/theme";
-
-import { colors, fontSize, screenPadding } from '@/core/theme'
-import { usePlayerBackground } from '@/hooks/usePlayerBackground'
-import { useTrackPlayerFavorite } from '@/hooks/useTrackPlayerFavorite'
-import { defaultStyles, utilsStyles } from '@/styles'
-import { FontAwesome } from '@expo/vector-icons'
-import { LinearGradient } from 'expo-linear-gradient'
-import { useEffect } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import FastImage from 'react-native-fast-image'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useActiveTrack } from 'react-native-track-player'
+import React, { useRef, useState } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { useActiveTrack } from 'react-native-track-player';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '@/core/theme';
+import { defaultStyles } from '@/styles';
+import { unknownTrackImageUri } from '@/constants/images';
+import { usePlayerBackground } from '@/hooks/usePlayerBackground';
+import { MediaDisplay } from '@/components/MediaDisplay';
+import { MovingText } from '@/components/MovingText';
+import { PlayerProgressBar } from '@/components/PlayerProgressbar';
+import { PlayerControls } from '@/components/PlayerControls';
+import { FontAwesome6 } from '@expo/vector-icons' // (si installé)
+import { router } from 'expo-router';
+import { Modalize } from 'react-native-modalize';
+import { TrackOptionsModal } from '@/components/TrackOptionsModal';
 
 const PlayerScreen = () => {
-	const activeTrack = useActiveTrack()
-	const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri)
+  const activeTrack = useActiveTrack();
+  const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri);
+  const { top, bottom } = useSafeAreaInsets();
+  const [isPlaying, setIsPlaying] = useState(false);
+  console.log('🎵 Active Track URL:', activeTrack?.url);
+  const modalRef = useRef<Modalize>(null);
 
-	const { top, bottom } = useSafeAreaInsets()
+  if (!activeTrack) {
+    return (
+      <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator color={colors.icon} />
+      </View>
+    );
+  }
 
-	const { isFavorite, toggleFavorite } = useTrackPlayerFavorite()
+  return (
+    <LinearGradient
+          style={{ flex: 1 }}
+          colors={
+            imageColors
+              ? [imageColors.background, imageColors.primary]
+              : [colors.background, colors.background]
+          }
+        >
+      <View style={[styles.overlayContainer, { paddingTop: top + 40, paddingBottom: bottom + 20 }]}>
+      <View style={styles.headerRow}>
+      <TouchableOpacity onPress={() => router.back()}>
+        <FontAwesome6 name="arrow-left" size={25} color='white' />
+      </TouchableOpacity>
 
-	if (!activeTrack) {
-		return (
-			<View style={[defaultStyles.container, { justifyContent: 'center' }]}>
-				<ActivityIndicator color={colors.icon} />
-			</View>
-		)
-	}
-	useEffect(() => {
-        console.log("Active Track:", activeTrack)
-    }, [activeTrack])
-	return (
-		<LinearGradient
-			style={{ flex: 1 }}
-			colors={imageColors ? [imageColors.background, imageColors.primary] : [colors.background,colors.background]}
-		>
-			<View style={styles.overlayContainer}>
-				<DismissPlayerSymbol />
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        Lecture en cours
+      </Text>
 
-				<View style={{ flex: 1, marginTop: top + 70, marginBottom: bottom }}>
-					<View style={styles.artworkImageContainer}>
-						<FastImage
-							source={{
-								uri: activeTrack.artwork ?? unknownTrackImageUri,
-								priority: FastImage.priority.high,
-							}}
-							resizeMode="cover"
-							style={styles.artworkImage}
-						/>
-					</View>
+              <TouchableOpacity  onPress={(event) => { event.persist();
+          console.log('📦 Bouton options pressé');
+          if (modalRef.current) {
+            console.log('📈 modalRef trouvé, ouverture...');
+            modalRef.current.open();
+          } else {
+            console.log('❌ modalRef est null');
+          }
+        }}>
+      <FontAwesome6 name="ellipsis-vertical" size={25} color='white'/>
+      </TouchableOpacity>
+    </View>
 
-					<View style={{ flex: 1 }}>
-						<View style={{ marginTop: 'auto' }}>
-							<View style={{ height: 60 }}>
-								<View
-									style={{
-										flexDirection: 'row',
-										justifyContent: 'space-between',
-										alignItems: 'center',
-									}}
-								>
-									{/* Track title */}
-									<View style={styles.trackTitleContainer}>
-										<MovingText
-											text={activeTrack.title ?? ''}
-											animationThreshold={30}
-											style={styles.trackTitleText}
-										/>
-									</View>
+      <MediaDisplay
+        url={activeTrack.url}
+        artwork={activeTrack.artwork}
+        isPlaying={isPlaying}
+        onVideoEnd={() => setIsPlaying(false)}
+        trackType={activeTrack.trackType}
+      />
 
-									{/* Favorite button icon */}
-									<FontAwesome
-										name={isFavorite ? 'heart' : 'heart-o'}
-										size={20}
-										color={isFavorite ? colors.primary : colors.icon}
-										style={{ marginHorizontal: 14 }}
-										onPress={toggleFavorite}
-									/>
-								</View>
+      {/* Infos du track + Progress + Controls dans une seule zone qui reste en haut */}
+      <View style={styles.bottomSection}>
+        <View style={styles.trackInfoContainer}>
+          <MovingText
+            text={activeTrack.title ?? ''}
+            animationThreshold={30}
+            style={styles.trackTitleText}
+          />
+          {activeTrack.artist && (
+            <Text numberOfLines={1} style={styles.trackArtistText}>
+              {activeTrack.artist}
+            </Text>
+          )}
+        </View>
 
-								{/* Track artist */}
-								{activeTrack.artist && (
-									<Text numberOfLines={1} style={[styles.trackArtistText, { marginTop: 6 }]}>
-										{activeTrack.artist}
-									</Text>
-								)}
-							</View>
+        <PlayerProgressBar style={{ marginVertical: 12 }} />
 
-							<PlayerProgressBar style={{ marginTop: 32 }} />
+        <PlayerControls />
+      </View>
+      </View>
+      <TrackOptionsModal
+  ref={modalRef}
+  trackTitle={activeTrack.title}
+  artist={activeTrack.artist}
+  onLike={() => console.log('💖 Liked track')}
+  onAddToPlaylist={() => console.log('➕ Added to playlist')}
+/>
 
-							<PlayerControls style={{ marginTop: 40 }} />
-						</View>
-
-						<PlayerVolumeBar style={{ marginTop: 'auto', marginBottom: 30 }} />
-
-						<View style={utilsStyles.centeredRow}>
-							<PlayerRepeatToggle size={30} style={{ marginBottom: 6 }} />
-						</View>
-					</View>
-				</View>
-			</View>
-		</LinearGradient>
-	)
-}
-
-const DismissPlayerSymbol = () => {
-	const { top } = useSafeAreaInsets()
-
-	return (
-		<View
-			style={{
-				position: 'absolute',
-				top: top + 8,
-				left: 0,
-				right: 0,
-				flexDirection: 'row',
-				justifyContent: 'center',
-			}}
-		>
-			<View
-				accessible={false}
-				style={{
-					width: 50,
-					height: 8,
-					borderRadius: 8,
-					backgroundColor: '#fff',
-					opacity: 0.7,
-				}}
-			/>
-		</View>
-	)
-}
+    </LinearGradient>
+  );
+};
 
 const styles = StyleSheet.create({
-	overlayContainer: {
-		...defaultStyles.container,
-		paddingHorizontal: screenPadding.horizontal,
-		backgroundColor: 'rgba(0,0,0,0.5)',
-	},
-	artworkImageContainer: {
-		shadowOffset: {
-			width: 0,
-			height: 8,
-		},
-		shadowOpacity: 0.44,
-		shadowRadius: 11.0,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		height: '45%',
-	},
-	artworkImage: {
-		width: '100%',
-		height: '100%',
-		resizeMode: 'cover',
-		borderRadius: 12,
-	},
-	trackTitleContainer: {
-		flex: 1,
-		overflow: 'hidden',
-	},
-	trackTitleText: {
-		...defaultStyles.text,
-		fontSize: 22,
-		fontWeight: '700',
-	},
-	trackArtistText: {
-		...defaultStyles.text,
-		fontSize: fontSize.base,
-		opacity: 0.8,
-		maxWidth: '90%',
-	},
-})
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+    marginHorizontal: 16,
+  },
+  
+  overlayContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  
+  bottomSection: {
+    flexShrink: 1,
+    justifyContent: 'flex-start',
+  },
+  
+  trackInfoContainer: {
+    alignItems: 'baseline',
+    marginBottom: 12,
+  },
+  playlistText: {
+    fontSize: 14,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
 
-export default PlayerScreen
+  trackTitleText: {
+    fontSize: 20,//18
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+
+  },
+  trackArtistText: {
+    fontSize: 16,//14
+    color: 'lightgray',
+      textAlign: 'center',
+    marginTop: 4,
+  },
+});
+
+export default PlayerScreen;
