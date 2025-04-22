@@ -39,7 +39,19 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-
+  const signOut = async () => {
+    setLoading(true);
+    try {
+      await AsyncStorage.removeItem("auth_token");
+      setUser(null); // ou undefined selon ton useState
+      router.replace("/(tabs)/home"); // ou autre route selon ton app
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion :", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Récupérer les infos de l'utilisateur
   const fetchUserInfo = async () => {
     setLoading(true);
@@ -54,10 +66,16 @@ export const useAuth = () => {
     }
   };
 
-  // Charger les infos utilisateur au montage
   useEffect(() => {
-    fetchUserInfo();
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (token) {
+        await fetchUserInfo();
+      }
+    };
+    checkAuth();
   }, []);
+  
 
-  return { signIn, signUp, user, fetchUserInfo, loading, error };
+  return { signIn, signUp, user, fetchUserInfo, loading, error ,signOut};
 };

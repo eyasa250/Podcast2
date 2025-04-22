@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = "http://192.168.1.17:3001"; 
+const API_BASE_URL = "http://192.168.1.16:3001"; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// Intercepteur pour ajouter automatiquement le token à chaque requête
+/* // Intercepteur pour ajouter automatiquement le token à chaque requête
 api.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem("auth_token");
@@ -27,7 +27,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
-);
+); */
 
 // Fonction pour récupérer tous les podcasts
 export const getAllPodcasts = async () => {

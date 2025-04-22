@@ -1,7 +1,8 @@
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/core/theme';
+import { useAuth } from '@/hooks/useAuth';
 
 const ProfileScreen = () => {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -11,6 +12,7 @@ const ProfileScreen = () => {
     { id: '2', name: 'Blinding Lights', artist: 'The Weeknd', cover: 'https://via.placeholder.com/100' },
     { id: '3', name: 'After Hours', artist: 'The Weeknd', cover: 'https://via.placeholder.com/100' },
   ];
+  const { signOut, user } = useAuth();
 
   return (
     <LinearGradient colors={[colors.primary, '#191414']} style={styles.gradient}>
@@ -21,7 +23,10 @@ const ProfileScreen = () => {
         {/* Informations utilisateur */}
         <Text style={styles.username}>John Doe</Text>
         <Text style={styles.userBio}>🎵 Music lover | Playlist curator</Text>
-
+        <View>
+      <Text>Bienvenue {user?.name}</Text>
+      <Button title="Se déconnecter" onPress={signOut} />
+    </View>
         {/* Bouton Suivre */}
         <TouchableOpacity
           style={[styles.followButton, { backgroundColor: isFollowing ? '#fff' : '#1DB954' }]}

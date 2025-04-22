@@ -15,14 +15,19 @@ import { FontAwesome6 } from '@expo/vector-icons' // (si installé)
 import { router } from 'expo-router';
 import { Modalize } from 'react-native-modalize';
 import { TrackOptionsModal } from '@/components/TrackOptionsModal';
+import Video from 'react-native-video';
+import { useProgress } from 'react-native-track-player';
 
 const PlayerScreen = () => {
   const activeTrack = useActiveTrack();
   const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri);
   const { top, bottom } = useSafeAreaInsets();
   const [isPlaying, setIsPlaying] = useState(false);
+
+
   console.log('🎵 Active Track URL:', activeTrack?.url);
   const modalRef = useRef<Modalize>(null);
+  const videoUrl = 'http://192.168.1.16:3001/uploads/sample.mp4';
 
   if (!activeTrack) {
     return (
@@ -64,14 +69,22 @@ const PlayerScreen = () => {
       </TouchableOpacity>
     </View>
 
-      <MediaDisplay
+    {/*   <MediaDisplay
         url={activeTrack.url}
         artwork={activeTrack.artwork}
         isPlaying={isPlaying}
         onVideoEnd={() => setIsPlaying(false)}
         trackType={activeTrack.trackType}
-      />
-
+      /> */}
+    {/* Affichage de la vidéo */}
+    <Video
+          source={{ uri: activeTrack.url }} // Utiliser l'URL de la vidéo
+          style={styles.video}
+          controls={false} // Afficher les contrôles de lecture
+          onEnd={() => setIsPlaying(false)}
+          onLoad={() => setIsPlaying(true)}
+          resizeMode="contain" // Ajuster la vidéo pour qu'elle ne dépasse pas l'écran
+        />
       {/* Infos du track + Progress + Controls dans une seule zone qui reste en haut */}
       <View style={styles.bottomSection}>
         <View style={styles.trackInfoContainer}>
@@ -136,6 +149,11 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     marginBottom: 12,
   },
+  video: {
+    width: '100%',
+    height: 250, // Ajuster la taille de la vidéo selon tes besoins
+    backgroundColor: 'black',
+  },
   playlistText: {
     fontSize: 14,
     color: 'white',
@@ -156,6 +174,4 @@ const styles = StyleSheet.create({
       textAlign: 'center',
     marginTop: 4,
   },
-});
-
-export default PlayerScreen;
+});export default PlayerScreen;

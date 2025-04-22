@@ -1,4 +1,4 @@
-import React from "react";
+/* import React from "react";
 import Background from "@/components/Background";
 import BackButton from "@/components/BackButton";
 import Logo from "@/components/Logo";
@@ -15,15 +15,21 @@ export default function HomeScreen() {
     <Background>
       <Logo />
       <Header>Welcome to Podcasty</Header>
-      <Paragraph>
-        login screen.
-      </Paragraph>
-      <Button mode="contained" onPress={() => router.push("/auth/login")}>
+  
+      <Button mode="outlined" onPress={() => router.push("/auth/login")}>
         Log in
       </Button>
       <Button mode="outlined" onPress={() => router.push("/auth/register")}>
         Create an account
       </Button>
+   
     </Background>
   );
+}
+ */
+// app/index.tsx
+import { Redirect } from "expo-router";
+
+export default function Index() {
+  return <Redirect href="/(tabs)/home" />;
 }

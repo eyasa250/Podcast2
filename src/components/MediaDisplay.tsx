@@ -1,84 +1,68 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import Video from 'react-native-video';
-import { unknownTrackImageUri } from '@/constants/images';
+// MediaDisplay.tsx
+import React, { useEffect, useRef } from 'react'
+import { View, StyleSheet } from 'react-native'
+import Video from 'react-native-video'
+import FastImage from 'react-native-fast-image'
+import { useProgress } from 'react-native-track-player'
+import { colors } from '@/core/theme'
 
 type Props = {
-  url: string;
-  artwork?: string;
-  isPlaying: boolean;
-  onVideoEnd: () => void;
-  trackType: string;
-};
-/* type Props = {
-  url: string | number;
-  artwork?: string;
-  isPlaying: boolean;
-  onVideoEnd: () => void;
-  trackType: string;
-  isLocal?: boolean; // ✅ flag optionnel pour dire si c’est un fichier local
-}; */
+  url: string
+  artwork: string
+  isPlaying: boolean
+  trackType: 'video' | 'audio'
+  onVideoEnd?: () => void
+}
 
+export const MediaDisplay = ({ url, artwork, isPlaying, trackType, onVideoEnd }: Props) => {
+  const videoRef = useRef<any>(null)
+  const { position } = useProgress()
 
-export const MediaDisplay = ({  url, artwork, isPlaying, onVideoEnd, trackType }: Props) => {
-  const isVideo = trackType === 'VIDEO';
-  const videoPlayer = useRef(null);
+  // Sync la position de la vidéo avec TrackPlayer
+  useEffect(() => {
+    if (trackType === 'video' && videoRef.current && position) {
+      videoRef.current.seek(position)
+    }
+  }, [position, trackType])
 
-  if (!url) return null;
-
-  return isVideo ? (
-    <Video
-      ref={videoPlayer}
-      source={{ uri: url }}
-      style={styles.videoPlayer}
-      controls={false} // ✅ contrôles natifs activés
-      paused={!isPlaying}
-      resizeMode="contain"
-      onEnd={onVideoEnd}
-    />
- /*    <Video
-   // ref={videoPlayer}
-    source={require('@/assets/sample.mp4')}    style={styles.videoPlayer}
-    controls
-    paused={!isPlaying}
-    resizeMode="contain"
-    onEnd={onVideoEnd}
-  /> */
-  
-
-  ) : (
-    <View style={styles.artworkImageContainer}>
-      <FastImage
-        source={{ uri: artwork ?? unknownTrackImageUri }}
-        resizeMode="cover"
-        style={styles.artworkImage}
-      />
+  return (
+    <View style={styles.container}>
+      {trackType === 'video' ? (
+        <Video
+          ref={videoRef}
+          source={{ uri: url }}
+          style={styles.video}
+          paused={!isPlaying}
+          resizeMode="contain"
+          controls={false}
+          onEnd={onVideoEnd}
+        />
+      ) : (
+        <FastImage
+          style={styles.image}
+          source={{ uri: artwork }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+      )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
-  videoPlayer: {
+  container: {
     width: '100%',
-    height: 220,
-    backgroundColor: 'black',
-    borderRadius: 20, // ✅ plus arrondi
-    overflow: 'hidden', // ✅ permet de masquer les coins dépassants
-    marginBottom: 16,
-  },
-  artworkImageContainer: {
+    aspectRatio: 1,
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 300,
-    borderRadius: 20,
-    overflow: 'hidden', // ✅ arrondis aussi
-    backgroundColor: '#000',
-    marginBottom: 16,
   },
-  artworkImage: {
+  video: {
     width: '100%',
     height: '100%',
-    borderRadius: 20,
   },
-});
+  image: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  },
+})

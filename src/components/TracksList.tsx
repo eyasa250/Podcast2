@@ -66,11 +66,15 @@ import { defaultStyles, utilsStyles } from '@/styles';
 import FastImage from 'react-native-fast-image';
 import { unknownTrackImageUri } from '@/constants/images';
 import { colors } from '@/core/theme';
+import { router } from 'expo-router';
 
 export const TracksList = ({ data }: { data: Track[] }) => {
+
   const handleTrackSelect = async (track: Track) => {
     await TrackPlayer.load(track);
     await TrackPlayer.play();
+    router.push('/player'); // Redirige vers PlayerScreen
+
   };
 
   return (
@@ -82,9 +86,9 @@ export const TracksList = ({ data }: { data: Track[] }) => {
         <View>
           <Text style={utilsStyles.emptyContentText}>No Podcasts found</Text>
           <FastImage
-            source={{ uri: unknownTrackImageUri, priority: FastImage.priority.normal }}
-            style={styles.emptyContentImage}
-          />
+				source={{ uri:  unknownTrackImageUri }}
+				style={styles.trackArtworkImage}
+			/>
         </View>
       }
       renderItem={({ item: track }) => (
@@ -118,5 +122,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 40,
     opacity: 0.3,
-  },
+  },trackArtworkImage: {
+		width: 40,
+		height: 40,
+		borderRadius: 8,
+	},
 });

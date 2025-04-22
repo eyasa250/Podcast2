@@ -2,15 +2,15 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { DrawerActions } from "@react-navigation/native";
 import { colors } from "@/core/theme";
+import { router } from "expo-router";
 
 const AvatarButton = () => {
   const navigation = useNavigation();
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.dispatch(DrawerActions.openDrawer())} // ✅ Correction ici
+       onPress={() => router.push("/profile")} // ✅ Correction ici
       style={styles.avatar}
     >
       <Text style={styles.avatarText}>S</Text>
