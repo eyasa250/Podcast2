@@ -17,17 +17,14 @@ const ProfileScreen = () => {
   return (
     <LinearGradient colors={[colors.primary, '#191414']} style={styles.gradient}>
       <View style={styles.container}>
-        {/* Image de profil */}
         <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.profileImage} />
 
-        {/* Informations utilisateur */}
-        <Text style={styles.username}>John Doe</Text>
+        <Text style={styles.username}>John Doe</Text>   
         <Text style={styles.userBio}>🎵 Music lover | Playlist curator</Text>
         <View>
       <Text>Bienvenue {user?.name}</Text>
       <Button title="Se déconnecter" onPress={signOut} />
     </View>
-        {/* Bouton Suivre */}
         <TouchableOpacity
           style={[styles.followButton, { backgroundColor: isFollowing ? '#fff' : '#1DB954' }]}
           onPress={() => setIsFollowing(!isFollowing)}
@@ -37,7 +34,6 @@ const ProfileScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        {/* Section Recently Played */}
         <Text style={styles.sectionTitle}>🎧 Recently Played</Text>
         <FlatList
           data={recentTracks}
@@ -52,7 +48,6 @@ const ProfileScreen = () => {
             </View>
           )}
         />
-                {/* Section favorites */}
 
          <Text style={styles.sectionTitle}>🎧 favorites</Text>
         <FlatList
@@ -74,12 +69,12 @@ const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  gradient: { flex: 1 }, // Fond en dégradé
+  gradient: { flex: 1 },
   container: { 
     flex: 1, 
     alignItems: 'center', 
     padding: 20, 
-    backgroundColor: 'transparent' // Pour laisser voir le gradient
+    backgroundColor: 'transparent' 
   },
   profileImage: {
     width: 120, 
@@ -147,3 +142,24 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
+
+/*  import PodcasterProfile from '@/components/PodcasterProfile';
+import AuditorProfile from '@/components/AuditorProfile';
+
+import { useAuth } from "@/hooks/useAuth";
+import React from "react";
+
+const ProfileScreen = () => {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  switch (user.role) {
+    case 'podcaster':
+      return <PodcasterProfile user={user} />;
+    case 'auditor':
+    default:
+      return <AuditorProfile user={user} />;
+  }
+};
+export default ProfileScreen;  */

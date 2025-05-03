@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 
@@ -62,7 +62,7 @@ export default function PaymentScreen() {
           </View>
 
           {/* Bouton de paiement */}
-          <TouchableOpacity style={styles.button} onPress={handlePayment}>
+          <TouchableOpacity style={styles.button} onPress={() => router.push("/account/StepperScreen")}>
             <Text style={styles.buttonText}>Payer maintenant</Text>
           </TouchableOpacity>
         </View>
