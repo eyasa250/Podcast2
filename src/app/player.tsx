@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useActiveTrack } from 'react-native-track-player';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,8 +14,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Modalize } from 'react-native-modalize';
 import { TrackOptionsModal } from '@/components/TrackOptionsModal';
-import Video from 'react-native-video';
-import subtitles from '@/assets/sample.json'; // ton fichier JSON de sous-titres
+import Video, { SelectedTrackType, TextTrackType } from 'react-native-video';
 
 const PlayerScreen = () => {
   const activeTrack = useActiveTrack();
@@ -23,22 +22,35 @@ const PlayerScreen = () => {
   const { top, bottom } = useSafeAreaInsets();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  type Subtitle = { startTime: number; endTime: number; text: string };
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [activeSubtitle, setActiveSubtitle] = useState(null);
+  const modalRef = useRef<Modalize>(null);
 
-  const [activeSubtitle, setActiveSubtitle] = useState<Subtitle | null>(null);
-  
-    const modalRef = useRef<Modalize>(null);
+  // ✅ Charger le fichier .vtt local
+ // const vttFile = require('@/assets/sample.vtt');
+ // const vttUri = Image.resolveAssetSource(vttFile).uri;
+ const track = require('@/assets/sample.mp4');
+  // Tu peux supprimer cette ligne si tu ne veux plus utiliser le JSON :
+  // import subtitles from '@/assets/sample.json';
 
   useEffect(() => {
-    const active = subtitles.find(
-      (line) => currentTime >= line.startTime && currentTime <= line.endTime
-    );
-  
-    setActiveSubtitle(active ?? null); // ✅ transforme undefined en null
+    // Si tu veux toujours utiliser les sous-titres JSON comme overlay en plus :
+    // const active = subtitles.find(
+    //   (line) => currentTime >= line.startTime && currentTime <= line.endTime
+    // );
+    // setActiveSubtitle(active ?? null);
   }, [currentTime]);
+  useEffect(() => {
+    fetch('http://localhost:8081/sample.vtt')
+      .then((res) => {
+        if (!res.ok) throw new Error('Fichier VTT inaccessible');
+        return res.text();
+      })
+      .then((text) => console.log('📄 Contenu des sous-titres :', text.slice(0, 200)))
+      .catch((err) => console.error('❌ Erreur lors du chargement des sous-titres:', err));
+  }, []);
   
-
+  
   if (!activeTrack) {
     return (
       <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
@@ -71,28 +83,47 @@ const PlayerScreen = () => {
 
         {/* Video Player */}
         <View style={{ position: 'relative' }}>
-          <Video
-            source={{ uri: activeTrack.url }}
-            style={styles.video}
-            controls={true}
-            resizeMode="contain"
-            onLoad={() => setIsPlaying(true)}
-            onEnd={() => setIsPlaying(false)}
-            onProgress={({ currentTime }) => setCurrentTime(currentTime)}
-            onFullscreenPlayerWillPresent={() => setIsFullscreen(true)}
-            onFullscreenPlayerWillDismiss={() => setIsFullscreen(false)}
-          />
-          {activeSubtitle && (
-  <View
-    style={[
-      styles.subtitleContainer,
-      isFullscreen && styles.subtitleFullscreen,
-    ]}
-  >
-    <Text style={styles.subtitleText}>{activeSubtitle.text}</Text>
-  </View>
-)}
+        <Video
+  source={{ uri:  activeTrack.url }}
+  style={styles.video}
+  controls={true}
+  resizeMode="contain"
+  onLoad={() => setIsPlaying(true)}
+  onEnd={() => setIsPlaying(false)}
+  onProgress={({ currentTime }) => setCurrentTime(currentTime)}
+  textTracks={[
+    {
+      title: 'Français',
+      language: 'fr',
+      type: TextTrackType.VTT,
+      uri: 'http://localhost:8081/sample.vtt',
+    },
+    {
+      title: 'Anglais',
+      language: 'en',
+      type: TextTrackType.VTT,
+      uri: 'http://localhost:8081/sample.vtt',
+    },
+  ]}
+  selectedTextTrack={{
+    type: SelectedTrackType.LANGUAGE,
+    value: 'fr',
+  }}
 
+/>
+
+
+          {/* Si tu utilises toujours les sous-titres JSON en overlay */}
+        {/*     {activeSubtitle && (
+            <View
+              style={[
+                styles.subtitleContainer,
+                isFullscreen && styles.subtitleFullscreen,
+              ]}
+            >
+              <Text style={styles.subtitleText}>{activeSubtitle.text}</Text>
+            </View>
+          )} */}
         </View>
 
         {/* Track Infos */}
@@ -109,8 +140,8 @@ const PlayerScreen = () => {
               </Text>
             )}
           </View>
-          <PlayerProgressBar style={{ marginVertical: 12 }} />
-          <PlayerControls />
+   {/*        <PlayerProgressBar style={{ marginVertical: 12 }} />
+      <PlayerControls /> */}
         </View>
       </View>
 
@@ -144,11 +175,11 @@ const styles = StyleSheet.create({
   overlayContainer: {
     flex: 1,
     paddingHorizontal: 20,
-  },subtitleFullscreen: {
-    bottom: 60, // Plus haut que 10 pour qu'ils apparaissent au-dessus des contrôles natifs
+  },
+  subtitleFullscreen: {
+    bottom: 60,
     zIndex: 1000,
   },
-  
   video: {
     width: '100%',
     height: 250,

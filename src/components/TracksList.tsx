@@ -96,7 +96,7 @@ export const TracksList = ({ data }: { data: Track[] }) => {
           <TracksListItem track={track} onTrackSelect={handleTrackSelect} />
         </View>
       )}
-      keyExtractor={(item) => item.url}
+      keyExtractor={(item, index) => `${item.url}-${index}`}
       contentContainerStyle={styles.contentContainer} // Optional, to add margin/padding to the list
     />
   );

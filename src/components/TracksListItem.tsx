@@ -1,3 +1,4 @@
+import { unknownTrackImageUri } from '@/constants/images';
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableHighlight } from 'react-native';
 import { Card } from 'react-native-paper';
@@ -23,7 +24,7 @@ export const TracksListItem = ({
       <Card style={[styles.card
 /*         , isActiveTrack && styles.activeCard
  */        ]}>
-        <Card.Cover source={{ uri: track.artwork /* || 'https://via.placeholder.com/150'  */}} style={styles.image} />
+        <Card.Cover source={{ uri: track.artwork ?? unknownTrackImageUri}} style={styles.image} />
         <Card.Content>
           <Text style={styles.title}>{track.title}</Text>
           <Text style={styles.artist}>{track.artist || 'Unknown Artist'}</Text>
