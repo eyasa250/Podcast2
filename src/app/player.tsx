@@ -1,74 +1,78 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { useActiveTrack } from 'react-native-track-player';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '@/core/theme';
-import { defaultStyles } from '@/styles';
-import { unknownTrackImageUri } from '@/constants/images';
-import { usePlayerBackground } from '@/hooks/usePlayerBackground';
-import { MovingText } from '@/components/MovingText';
-import { PlayerProgressBar } from '@/components/PlayerProgressbar';
-import { PlayerControls } from '@/components/PlayerControls';
+import { Video, TextTrackType, SelectedTrackType, ISO639_1 } from 'react-native-video';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Modalize } from 'react-native-modalize';
 import { TrackOptionsModal } from '@/components/TrackOptionsModal';
-import Video, { SelectedTrackType, TextTrackType } from 'react-native-video';
 
 const PlayerScreen = () => {
   const activeTrack = useActiveTrack();
-  const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri);
   const { top, bottom } = useSafeAreaInsets();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeSubtitle, setActiveSubtitle] = useState(null);
   const modalRef = useRef<Modalize>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<ISO639_1>('en'); // Langue par défaut
 
-  // ✅ Charger le fichier .vtt local
- // const vttFile = require('@/assets/sample.vtt');
- // const vttUri = Image.resolveAssetSource(vttFile).uri;
- const track = require('@/assets/sample.mp4');
-  // Tu peux supprimer cette ligne si tu ne veux plus utiliser le JSON :
-  // import subtitles from '@/assets/sample.json';
+// Log activeTrack details
+useEffect(() => {
+  if (activeTrack) {
+    console.log('Active Track Details:', activeTrack);
+  }
+}, [activeTrack]);
 
-  useEffect(() => {
-    // Si tu veux toujours utiliser les sous-titres JSON comme overlay en plus :
-    // const active = subtitles.find(
-    //   (line) => currentTime >= line.startTime && currentTime <= line.endTime
-    // );
-    // setActiveSubtitle(active ?? null);
-  }, [currentTime]);
-  useEffect(() => {
-    fetch('http://localhost:8081/sample.vtt')
-      .then((res) => {
-        if (!res.ok) throw new Error('Fichier VTT inaccessible');
-        return res.text();
-      })
-      .then((text) => console.log('📄 Contenu des sous-titres :', text.slice(0, 200)))
-      .catch((err) => console.error('❌ Erreur lors du chargement des sous-titres:', err));
-  }, []);
-  
-  
+
+ /*  // Pour récupérer l'URL des sous-titres pour chaque vidéo
+  const getSubtitleUri = (trackUrl: string) => {
+    // Ici, tu associes un fichier .vtt à chaque URL de track
+    if (trackUrl.includes("track1.mp4")) {
+      return 'http://localhost:8081/subtitles/track1.vtt';
+    } else if (trackUrl.includes("track2.mp4")) {
+      return 'http://localhost:8081/subtitles/track2.vtt';
+    }
+    // Si aucun fichier n'est trouvé, renvoie une URL vide ou nulle
+    return null;
+  };
+
+  const subtitleUri = activeTrack ? getSubtitleUri(activeTrack.url) : null;
+ */
   if (!activeTrack) {
     return (
-      <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
-        <ActivityIndicator color={colors.icon} />
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <ActivityIndicator size="large" color="black" />
       </View>
     );
   }
+   // Extraire les URL des sous-titres disponibles avec le type ISO639_1 pour la langue
+   const subtitleTracks = Object.keys(activeTrack.languageTranscriptions).map((lang) => {
+    // Vérifie que la langue est dans les codes ISO valides
+    const isoLang = lang as ISO639_1; // Type assertion pour garantir la validité du code ISO
+    return {
+      title: isoLang,
+      language: isoLang,
+      type: TextTrackType.VTT,
+      uri: activeTrack.languageTranscriptions[lang],
+    };
+    // Fonction pour ouvrir/fermer le modal
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  // Fonction pour sélectionner une langue
+  const handleLanguageSelect = (language: ISO639_1) => {
+    setSelectedLanguage(language);
+    setIsModalVisible(false); // Ferme le modal après sélection
+  };
+  
+  });
 
   return (
-    <LinearGradient
-      style={{ flex: 1 }}
-      colors={
-        imageColors
-          ? [imageColors.background, imageColors.primary]
-          : [colors.background, colors.background]
-      }
-    >
-      <View style={[styles.overlayContainer, { paddingTop: top + 40, paddingBottom: bottom + 20 }]}>
+    <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
+      <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()}>
             <FontAwesome6 name="arrow-left" size={25} color="white" />
@@ -81,67 +85,56 @@ const PlayerScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Video Player */}
         <View style={{ position: 'relative' }}>
-        <Video
-  source={{ uri:  activeTrack.url }}
-  style={styles.video}
-  controls={true}
-  resizeMode="contain"
-  onLoad={() => setIsPlaying(true)}
-  onEnd={() => setIsPlaying(false)}
-  onProgress={({ currentTime }) => setCurrentTime(currentTime)}
-  textTracks={[
-    {
-      title: 'Français',
-      language: 'fr',
-      type: TextTrackType.VTT,
-      uri: 'http://localhost:8081/sample.vtt',
-    },
-    {
-      title: 'Anglais',
-      language: 'en',
-      type: TextTrackType.VTT,
-      uri: 'http://localhost:8081/sample.vtt',
-    },
-  ]}
-  selectedTextTrack={{
-    type: SelectedTrackType.LANGUAGE,
-    value: 'fr',
-  }}
-
-/>
-
-
-          {/* Si tu utilises toujours les sous-titres JSON en overlay */}
-        {/*     {activeSubtitle && (
-            <View
-              style={[
-                styles.subtitleContainer,
-                isFullscreen && styles.subtitleFullscreen,
-              ]}
-            >
-              <Text style={styles.subtitleText}>{activeSubtitle.text}</Text>
-            </View>
-          )} */}
+          {/* Video Player */}
+          <Video
+            source={{ uri: activeTrack.url }}
+            style={styles.video}
+            controls={true}
+            resizeMode="contain"
+            onLoad={() => setIsPlaying(true)}
+            onEnd={() => setIsPlaying(false)}
+            onProgress={({ currentTime }) => setCurrentTime(currentTime)}
+           /*  textTracks={
+              subtitleUri
+                ? [
+                    {
+                      title: 'Français',
+                      language: 'fr',
+                      type: TextTrackType.VTT,
+                      uri: subtitleUri,
+                    },
+                    {
+                      title: 'Anglais',
+                      language: 'en',
+                      type: TextTrackType.VTT,
+                      uri: subtitleUri,
+                    },
+                  ]
+                : []
+            }
+            selectedTextTrack={{
+              type: SelectedTrackType.LANGUAGE,
+              value: 'fr',
+            }} */
+              textTracks={subtitleTracks}
+              selectedTextTrack={{
+                type: SelectedTrackType.LANGUAGE,
+                value: selectedLanguage,  // La langue sélectionnée
+              }}
+          />
         </View>
 
         {/* Track Infos */}
         <View style={styles.bottomSection}>
           <View style={styles.trackInfoContainer}>
-            <MovingText
-              text={activeTrack.title ?? ''}
-              animationThreshold={30}
-              style={styles.trackTitleText}
-            />
+            <Text style={styles.trackTitleText}>{activeTrack.title}</Text>
             {activeTrack.artist && (
               <Text numberOfLines={1} style={styles.trackArtistText}>
                 {activeTrack.artist}
               </Text>
             )}
           </View>
-   {/*        <PlayerProgressBar style={{ marginVertical: 12 }} />
-      <PlayerControls /> */}
         </View>
       </View>
 
@@ -172,36 +165,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginHorizontal: 16,
   },
-  overlayContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  subtitleFullscreen: {
-    bottom: 60,
-    zIndex: 1000,
-  },
   video: {
     width: '100%',
     height: 250,
     backgroundColor: 'black',
-  },
-  subtitleContainer: {
-    position: 'absolute',
-    bottom: 10,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  subtitleText: {
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
   },
   bottomSection: {
     flexShrink: 1,
@@ -226,3 +193,7 @@ const styles = StyleSheet.create({
 });
 
 export default PlayerScreen;
+function setSelectedLanguage(language: string) {
+  throw new Error('Function not implemented.');
+}
+

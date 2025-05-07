@@ -4,7 +4,7 @@ import { Track } from "react-native-track-player";
 
 const API_BASE_URL = "http://192.168.1.24:3001"; // À remplacer par ton vrai domaine
 
-export const usePodcasts = () => {
+export const useEpisods = () => {
   const [podcasts, setPodcasts] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

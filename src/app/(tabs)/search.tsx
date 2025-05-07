@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { View, ScrollView, Text, ActivityIndicator } from "react-native";
 import { useSearchBar } from "@/hooks/useSearchBar";
 import { TracksList } from "@/components/TracksList";
-import { usePodcasts } from "@/hooks/usePodcasts";
+import { useEpisods } from "@/hooks/useEpisods";
 
 const SearchScreen: React.FC = () => {
   const { search, SearchBarComponent } = useSearchBar();
   const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
-  const { podcasts, loading, error } = usePodcasts();
+  const { podcasts, loading, error } = useEpisods();
 
   useEffect(() => {
     if (search.length === 0) {
