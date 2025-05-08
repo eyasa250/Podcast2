@@ -36,7 +36,7 @@ const ProfileScreen = () => {
           {/* Mes Podcasts */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Mes Podcasts</Text>
-            <TouchableOpacity style={styles.button} onPress={() =>  router.push("/stepper/VideoUploader")}>
+            <TouchableOpacity style={styles.button} onPress={() =>  router.push("/podcasts/videoUploader")}>
             <Ionicons name="add-circle-outline" size={24} color="white" />
               <Text style={styles.buttonText}>Ajouter un épisode</Text>
             </TouchableOpacity>

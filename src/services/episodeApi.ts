@@ -56,5 +56,10 @@ export const createEpisod = async (formData: FormData) => {
     throw error;
   }
 };
+// ✅ Correct
+export const getEpisodesByPodcastId = async (podcastId: string | number) => {
+  const response = await api.get(`/episodes/by-podcast/${podcastId}`);
+  return response.data;
+};
 
 export default api;

@@ -7,20 +7,20 @@ import { useEpisods } from "@/hooks/useEpisods";
 const SearchScreen: React.FC = () => {
   const { search, SearchBarComponent } = useSearchBar();
   const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
-  const { podcasts, loading, error } = useEpisods();
+  const { Episods, loading, error } = useEpisods();
 
   useEffect(() => {
     if (search.length === 0) {
       setFilteredTracks([]);
     } else {
-      const filtered = podcasts.filter(
+      const filtered = Episods.filter(
         (track) =>
           track?.title && track.title.toLowerCase().includes(search.toLowerCase()) ||
           (track?.artist && track.artist.toLowerCase().includes(search.toLowerCase()))
       );
       setFilteredTracks(filtered);
     }
-  }, [search, podcasts]);
+  }, [search, Episods]);
   
   return (
     <View style={{ flex: 1, paddingHorizontal: 10 }}>

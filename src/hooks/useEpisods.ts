@@ -1,46 +1,62 @@
-import { getAllEpisods } from "@/services/episodeApi";
-import { useEffect, useState } from "react";
+// hooks/useEpisodes.ts
+import { useState } from "react";
+import { getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
 import { Track } from "react-native-track-player";
 
-const API_BASE_URL = "http://192.168.1.24:3001"; // À remplacer par ton vrai domaine
+const API_BASE_URL = "http://192.168.1.16:3001";
 
-export const useEpisods = () => {
-  const [Episods, setEpisods] = useState<Track[]>([]);
-  const [loading, setLoading] = useState(true);
+export const useEpisodes = () => {
+  const [episodes, setEpisodes] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAllEpisods();
+  // Formateur commun
+  const formatData = (data: any[]): Track[] => {
+    return data.map((episode: any) => ({
+      id: episode.id?.toString() || Math.random().toString(),
+      url: episode.audioUrl?.startsWith("http")
+        ? episode.audioUrl
+        : `${API_BASE_URL}${episode.audioUrl}`,
+      title: episode.title || "Titre inconnu",
+      artist: episode.podcast?.name || "Artiste inconnu",
+      artwork: episode.artwork,
+      languageTranscriptions: episode.transcriptionUrls || {},
+    }));
+  };
 
-        // Vérifie que `data` est bien un tableau avant de le mapper
-        if (!Array.isArray(data)) {
-          throw new Error("Données invalides reçues de l'API");
-        }
+  const fetchAllEpisodes = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getAllEpisods();
+      setEpisodes(formatData(data));
+    } catch (err: any) {
+      console.error("Erreur fetchAllEpisodes:", err.message);
+      setError(err.message || "Erreur de récupération");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Transformation des données API en format TrackPlayer
-        const formattedData: Track[] = data.map((Episods: any) => ({
-          id: Episods.id?.toString() || Math.random().toString(), // Évite les erreurs si `id` est manquant
-          url: Episods.audioUrl?.startsWith("http") ? Episods.audioUrl : `${API_BASE_URL}${Episods.audioUrl}`,
-          title: Episods.title || "Titre inconnu",
-          artist: Episods.channel?.name || "Artiste inconnu",
-          artwork: Episods.artwork ,
-          languageTranscriptions: Episods.transcriptionUrls || {}, // on ajoute ici
+  const fetchEpisodesByPodcastId = async (podcastId: number | string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getEpisodesByPodcastId(podcastId);
+      setEpisodes(formatData(data));
+    } catch (err: any) {
+      console.error("Erreur fetchEpisodesByPodcastId:", err.message);
+      setError(err.message || "Erreur de récupération");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        }));
-
-        setEpisods(formattedData);
-      } catch (err: any) {
-        console.error("Erreur lors de la récupération des Episods:", err);
-        setError(err.message || "Impossible de récupérer les Episods");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  return { Episods, loading, error };
+  return {
+    episodes,
+    loading,
+    error,
+    fetchAllEpisodes,
+    fetchEpisodesByPodcastId,
+  };
 };
