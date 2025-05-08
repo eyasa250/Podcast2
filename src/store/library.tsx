@@ -1,13 +1,13 @@
 import library from '@/assets/library.json'
 import { unknownTrackImageUri } from '@/constants/images'
-import { Artist, Playlist, TrackWithPlaylist } from '@/helpers/types'
+import { Artist, podcast, TrackWithpodcast } from '@/helpers/types'
 import { Track } from 'react-native-track-player'
 import { create } from 'zustand'
 
 interface LibraryState {
-	tracks: TrackWithPlaylist[]
+	tracks: TrackWithpodcast[]
 	toggleTrackFavorite: (track: Track) => void
-	addToPlaylist: (track: Track, playlistName: string) => void
+	addTopodcast: (track: Track, podcastName: string) => void
 }
 
 export const useLibraryStore = create<LibraryState>()((set) => ({
@@ -25,13 +25,13 @@ export const useLibraryStore = create<LibraryState>()((set) => ({
 				return currentTrack
 			}),
 		})),
-	addToPlaylist: (track, playlistName) =>
+	addTopodcast: (track, podcastName) =>
 		set((state) => ({
 			tracks: state.tracks.map((currentTrack) => {
 				if (currentTrack.url === track.url) {
 					return {
 						...currentTrack,
-						playlist: [...(currentTrack.playlist ?? []), playlistName],
+						podcast: [...(currentTrack.podcast ?? []), podcastName],
 					}
 				}
 
@@ -70,17 +70,17 @@ export const useArtists = () =>
 		}, [] as Artist[])
 	})
 
-export const usePlaylists = () => {
-	const playlists = useLibraryStore((state) => {
+export const usepodcasts = () => {
+	const podcasts = useLibraryStore((state) => {
 		return state.tracks.reduce((acc, track) => {
-			track.playlist?.forEach((playlistName) => {
-				const existingPlaylist = acc.find((playlist) => playlist.name === playlistName)
+			track.podcast?.forEach((podcastName) => {
+				const existingpodcast = acc.find((podcast) => podcast.name === podcastName)
 
-				if (existingPlaylist) {
-					existingPlaylist.tracks.push(track)
+				if (existingpodcast) {
+					existingpodcast.tracks.push(track)
 				} else {
 					acc.push({
-						name: playlistName,
+						name: podcastName,
 						tracks: [track],
 						artworkPreview: track.artwork ?? unknownTrackImageUri,
 					})
@@ -88,10 +88,10 @@ export const usePlaylists = () => {
 			})
 
 			return acc
-		}, [] as Playlist[])
+		}, [] as podcast[])
 	})
 
-	const addToPlaylist = useLibraryStore((state) => state.addToPlaylist)
+	const addTopodcast = useLibraryStore((state) => state.addTopodcast)
 
-	return { playlists, addToPlaylist }
+	return { podcasts, addTopodcast }
 }

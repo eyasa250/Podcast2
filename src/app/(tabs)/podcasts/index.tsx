@@ -1,56 +1,50 @@
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { usePodcasts } from "@/hooks/usePodcasts";
 
-const episodes = [
-  { id: "1", title: "Épisode 1 - Introduction", duration: "12:45" },
-  { id: "2", title: "Épisode 2 - Histoire et évolution", duration: "24:30" },
-  { id: "3", title: "Épisode 3 - Astuces et conseils", duration: "18:20" },
-];
 
-export default function PlaylistScreen() {
+
+export default function podcastScreen() {
+  const router = useRouter();
+  const { podcasts, loading, error } = usePodcasts();
+
+  if (loading) return <Text>Chargement des podcasts...</Text>;
+  if (error) return <Text>Erreur : {error}</Text>;
+
   return (
     <View style={styles.container}>
-      {/* Image de couverture */}
-      <Image
-        source={{ uri: "https://via.placeholder.com/300x200" }}
-        style={styles.coverImage}
-      />
+      <Text style={styles.title}>Podcasts disponibles</Text>
 
-      {/* Nom de la playlist */}
-      <Text style={styles.title}>Ma Playlist Favoris</Text>
-      <Text style={styles.description}>Une sélection des meilleurs épisodes pour vous.</Text>
+      <TouchableOpacity
+        style={{ marginBottom: 20, alignSelf: "flex-end" }}
+        onPress={() => router.push("/(tabs)/podcasts/create")}
+      >
+        <Text style={{ color: "#007AFF", fontWeight: "bold" }}>+ Nouvelle podcast</Text>
+      </TouchableOpacity>
 
-      {/* Boutons Play et Shuffle */}
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Ionicons name="play" size={24} color="#fff" />
-          <Text style={styles.buttonText}>Lecture</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonOutline}>
-          <Ionicons name="shuffle" size={24} color="#007AFF" />
-          <Text style={styles.buttonOutlineText}>Aléatoire</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Liste des épisodes */}
       <FlatList
-        data={episodes}
+        data={podcasts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.episodeItem}>
-            <View>
+          <TouchableOpacity
+            onPress={() => router.push(`/(tabs)/podcasts`)}
+            style={styles.episodeItem}
+          >
+            <Image source={{ uri: item.artwork }} style={{ width: 50, height: 50, borderRadius: 5 }} />
+            <View style={{ marginLeft: 10 }}>
               <Text style={styles.episodeTitle}>{item.title}</Text>
-              <Text style={styles.episodeDuration}>{item.duration}</Text>
+              <Text style={styles.episodeDuration}>Par {item.artist}</Text>
             </View>
-            <TouchableOpacity>
-              <Ionicons name="ellipsis-vertical" size={20} color="gray" />
-            </TouchableOpacity>
-          </View>
+            <Ionicons name="chevron-forward" size={20} color="gray" />
+          </TouchableOpacity>
         )}
       />
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

@@ -8,11 +8,11 @@ type TrackOptionsModalProps = {
   trackTitle?: string;
   artist?: string;
   onLike?: () => void;
-  onAddToPlaylist?: () => void;
+  onAddTopodcast?: () => void;
 };
 
 export const TrackOptionsModal = forwardRef<Modalize, TrackOptionsModalProps>(
-  ({ trackTitle, artist, onLike, onAddToPlaylist }, ref) => {
+  ({ trackTitle, artist, onLike, onAddTopodcast }, ref) => {
     return (
       <Modalize ref={ref} snapPoint={350} modalHeight={400}>
         <View style={styles.container}>
@@ -21,7 +21,7 @@ export const TrackOptionsModal = forwardRef<Modalize, TrackOptionsModalProps>(
           </Text>
 
           <OptionItem icon="heart" text="Like" onPress={onLike} />
-          <OptionItem icon="plus" text="Add to playlist" onPress={onAddToPlaylist} />
+          <OptionItem icon="plus" text="Add to podcast" onPress={onAddTopodcast} />
           <OptionItem icon="user" text="View artist" />
           <OptionItem icon="compact-disc" text="View album" />
           <OptionItem icon="eye-slash" text="hide this podcast" />

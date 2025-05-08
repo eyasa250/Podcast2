@@ -62,7 +62,7 @@ export default function PaymentScreen() {
           </View>
 
           {/* Bouton de paiement */}
-          <TouchableOpacity style={styles.button} onPress={() => router.push("/account/StepperScreen")}>
+          <TouchableOpacity style={styles.button} onPress={() => router.push("/profile")}>
             <Text style={styles.buttonText}>Payer maintenant</Text>
           </TouchableOpacity>
         </View>

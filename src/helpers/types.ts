@@ -1,6 +1,6 @@
 import { Track } from 'react-native-track-player'
 
-export type Playlist = {
+export type podcast = {
 	name: string
 	tracks: Track[]
 	artworkPreview: string
@@ -11,4 +11,4 @@ export type Artist = {
 	tracks: Track[]
 }
 
-export type TrackWithPlaylist = Track & { playlist?: string[] }
+export type TrackWithpodcast = Track & { podcast?: string[] }

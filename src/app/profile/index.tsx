@@ -1,165 +1,170 @@
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
-import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '@/core/theme';
+import React from 'react';
+import { View, Text, Button, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Assure-toi d'avoir installé la bibliothèque d'icônes
 import { useAuth } from '@/hooks/useAuth';
+import { router } from 'expo-router';
 
 const ProfileScreen = () => {
-  const [isFollowing, setIsFollowing] = useState(false);
+  const { signOut, user } = useAuth();  // Accède aux données de l'utilisateur via useAuth
 
-  const recentTracks = [
-    { id: '1', name: 'Lost in the Fire', artist: 'Gesaffelstein & The Weeknd', cover: 'https://via.placeholder.com/100' },
-    { id: '2', name: 'Blinding Lights', artist: 'The Weeknd', cover: 'https://via.placeholder.com/100' },
-    { id: '3', name: 'After Hours', artist: 'The Weeknd', cover: 'https://via.placeholder.com/100' },
-  ];
-  const { signOut, user } = useAuth();
+  if (!user) {
+    return <Text>Chargement...</Text>;  // Affiche un message pendant que les données de l'utilisateur se chargent
+  }
 
   return (
-    <LinearGradient colors={[colors.primary, '#191414']} style={styles.gradient}>
-      <View style={styles.container}>
-        <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.profileImage} />
-
-        <Text style={styles.username}>John Doe</Text>   
-        <Text style={styles.userBio}>🎵 Music lover | Playlist curator</Text>
-        <View>
-      <Text>Bienvenue {user?.name}</Text>
-      <Button title="Se déconnecter" onPress={signOut} />
-    </View>
-        <TouchableOpacity
-          style={[styles.followButton, { backgroundColor: isFollowing ? '#fff' : '#1DB954' }]}
-          onPress={() => setIsFollowing(!isFollowing)}
-        >
-          <Text style={[styles.followText, { color: isFollowing ? '#1DB954' : 'white' }]}>
-            {isFollowing ? 'Suivi' : 'Suivre'}
-          </Text>
-        </TouchableOpacity>
-
-        <Text style={styles.sectionTitle}>🎧 Recently Played</Text>
-        <FlatList
-          data={recentTracks}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.trackItem}>
-              <Image source={{ uri: item.cover }} style={styles.trackCover} />
-              <Text style={styles.trackName}>{item.name}</Text>
-              <Text style={styles.trackArtist}>{item.artist}</Text>
-            </View>
-          )}
+    <ScrollView style={styles.container}>
+      {/* En-tête */}
+      <View style={styles.header}>
+        <Image
+          source={{ uri: user.profilePic }}  // Affiche la photo de profil de l'utilisateur
+          style={styles.profilePic}
         />
-
-         <Text style={styles.sectionTitle}>🎧 favorites</Text>
-        <FlatList
-          data={recentTracks}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.trackItem}>
-              <Image source={{ uri: item.cover }} style={styles.trackCover} />
-              <Text style={styles.trackName}>{item.name}</Text>
-              <Text style={styles.trackArtist}>{item.artist}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.role}>
+          {user.role === 'PODCASTER' ? 'Podcasteur Premium' : 'Auditeur'}
+        </Text>
       </View>
-    </LinearGradient>
+
+      {/* Bio */}
+      <Text style={styles.bio}>
+        {user.bio || 'Aucune bio définie.'}
+      </Text>
+
+      {/* Section des abonnements ou podcasts selon le rôle */}
+      {user.role === 'PODCASTER' ? (
+        <>
+          {/* Mes Podcasts */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Mes Podcasts</Text>
+            <TouchableOpacity style={styles.button} onPress={() =>  router.push("/stepper/VideoUploader")}>
+            <Ionicons name="add-circle-outline" size={24} color="white" />
+              <Text style={styles.buttonText}>Ajouter un épisode</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Statistiques */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Statistiques</Text>
+            <Text style={styles.stat}>Abonnés: 1,200</Text>
+            <Text style={styles.stat}>Lectures: 10,000</Text>
+          </View>
+        </>
+      ) : (
+        <>
+          {/* Mes Abonnements */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Mes Abonnements</Text>
+            <Text style={styles.stat}>Podcast 1 - Titre</Text>
+            <Text style={styles.stat}>Podcast 2 - Titre</Text>
+          </View>
+        </>
+      )}
+
+      {/* Section Déconnexion */}
+      <View style={styles.logoutSection}>
+        <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+          <Ionicons name="log-out-outline" size={24} color="white" />
+          <Text style={styles.logoutButtonText}>Se Déconnecter</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  gradient: { flex: 1 },
-  container: { 
-    flex: 1, 
-    alignItems: 'center', 
-    padding: 20, 
-    backgroundColor: 'transparent' 
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  profileImage: {
-    width: 120, 
-    height: 120, 
-    borderRadius: 60, 
-    borderWidth: 3, 
-    borderColor: 'white',
-    marginBottom: 10
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
   },
-  username: { 
-    color: 'white', 
-    fontSize: 22, 
-    fontWeight: 'bold' 
+  profilePic: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 10,
+    borderWidth: 3,
+    borderColor: '#4CAF50', // Bordure verte pour attirer l'attention sur l'image de profil
   },
-  userBio: { 
-    color: 'white', 
-    fontSize: 14, 
-    marginBottom: 15,
-    textAlign: 'center'
+  username: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#333',
   },
-  followButton: { 
-    paddingVertical: 10, 
-    paddingHorizontal: 30, 
-    borderRadius: 20, 
-    marginTop: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5
+  role: {
+    fontSize: 16,
+    color: '#888',
   },
-  followText: { 
-    fontSize: 16, 
-    fontWeight: 'bold' 
-  },
-  sectionTitle: { 
-    color: 'white', 
-    fontSize: 18, 
-    marginVertical: 20, 
-    alignSelf: 'flex-start', 
-    fontWeight: 'bold'
-  },
-  trackItem: { 
-    marginRight: 15, 
-    alignItems: 'center', 
-    width: 120
-  },
-  trackCover: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 10
-  },
-  trackName: { 
-    color: 'white', 
-    fontSize: 14, 
-    marginTop: 5, 
+  bio: {
+    fontSize: 16,
+    fontStyle: 'italic',
     textAlign: 'center',
-    fontWeight: 'bold'
+    color: '#555',
+    marginBottom: 20,
   },
-  trackArtist: { 
-    color: '#ddd', 
-    fontSize: 12, 
-    textAlign: 'center'
+  section: {
+    marginBottom: 25,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
+  stat: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 8,
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  logoutSection: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#FF5722',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 10,
   },
 });
 
 export default ProfileScreen;
-
-/*  import PodcasterProfile from '@/components/PodcasterProfile';
-import AuditorProfile from '@/components/AuditorProfile';
-
-import { useAuth } from "@/hooks/useAuth";
-import React from "react";
-
-const ProfileScreen = () => {
-  const { user } = useAuth();
-
-  if (!user) return null;
-
-  switch (user.role) {
-    case 'podcaster':
-      return <PodcasterProfile user={user} />;
-    case 'auditor':
-    default:
-      return <AuditorProfile user={user} />;
-  }
-};
-export default ProfileScreen;  */

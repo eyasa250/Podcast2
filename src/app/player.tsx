@@ -47,18 +47,20 @@ useEffect(() => {
       </View>
     );
   }
-   // Extraire les URL des sous-titres disponibles avec le type ISO639_1 pour la langue
-   const subtitleTracks = Object.keys(activeTrack.languageTranscriptions).map((lang) => {
-    // Vérifie que la langue est dans les codes ISO valides
-    const isoLang = lang as ISO639_1; // Type assertion pour garantir la validité du code ISO
-    return {
-      title: isoLang,
-      language: isoLang,
-      type: TextTrackType.VTT,
-      uri: activeTrack.languageTranscriptions[lang],
-    };
-    // Fonction pour ouvrir/fermer le modal
-  const toggleModal = () => {
+  const subtitleTracks = activeTrack.languageTranscriptions
+  ? Object.keys(activeTrack.languageTranscriptions).map((lang) => {
+      const isoLang = lang as ISO639_1;
+      return {
+        title: isoLang,
+        language: isoLang,
+        type: TextTrackType.VTT,
+        uri: activeTrack.languageTranscriptions[lang],
+      };
+    })
+  : [];
+
+   // Fonction pour ouvrir/fermer le modal
+   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
@@ -67,9 +69,6 @@ useEffect(() => {
     setSelectedLanguage(language);
     setIsModalVisible(false); // Ferme le modal après sélection
   };
-  
-  });
-
   return (
     <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
@@ -94,8 +93,8 @@ useEffect(() => {
             resizeMode="contain"
             onLoad={() => setIsPlaying(true)}
             onEnd={() => setIsPlaying(false)}
-            onProgress={({ currentTime }) => setCurrentTime(currentTime)}
-           /*  textTracks={
+            onProgress={({ currentTime: time }) => setCurrentTime(time)}
+            /*  textTracks={
               subtitleUri
                 ? [
                     {
@@ -143,7 +142,7 @@ useEffect(() => {
         trackTitle={activeTrack.title}
         artist={activeTrack.artist}
         onLike={() => console.log('💖 Liked track')}
-        onAddToPlaylist={() => console.log('➕ Added to playlist')}
+        onAddTopodcast={() => console.log('➕ Added to podcast')}
       />
     </LinearGradient>
   );
@@ -193,7 +192,5 @@ const styles = StyleSheet.create({
 });
 
 export default PlayerScreen;
-function setSelectedLanguage(language: string) {
-  throw new Error('Function not implemented.');
-}
+
 

@@ -6,8 +6,12 @@ const API_URL = "http://192.168.1.16:3001"; // Assure-toi que l'IP correspond bi
 // Fonction de connexion
 export const login = async (email: string, password: string) => {
   const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+  console.log('Réponse complète après login:', response.data);  // Logue toute la réponse
+  console.log('Token reçu après login:', response.data.access_token); // Logue le token
+
   return response.data;
 };
+
 
 // Fonction d'inscription
 export const register = async (name: string, email: string, password: string, confirmPassword: string, role: string) => {

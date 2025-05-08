@@ -15,6 +15,7 @@ export const useAuth = () => {
     setError(null);
     try {
       const { access_token } = await login(email, password);
+
       await AsyncStorage.setItem("auth_token", access_token);
       await fetchUserInfo(); // Récupérer les infos de l'utilisateur après connexion
       router.replace("/(tabs)/home");

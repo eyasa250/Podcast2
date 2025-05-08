@@ -1,12 +1,12 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
-interface PlaylistItemProps {
+interface podcasttemProps {
   title: string;
   cover: string;
   onPress: () => void;
 }
 
-export default function PlaylistItem({ title, cover, onPress }: PlaylistItemProps) {
+export default function podcastItem({ title, cover, onPress }: podcastItemProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image source={{ uri: cover }} style={styles.image} />

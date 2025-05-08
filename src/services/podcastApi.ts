@@ -10,7 +10,7 @@ const api = axios.create({
   },
 });
 
-/* // Intercepteur pour ajouter automatiquement le token à chaque requête
+// Intercepteur pour ajouter automatiquement le token à chaque requête
 api.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem("auth_token");
@@ -27,7 +27,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
-); */
+); 
 
 // Fonction pour récupérer tous les podcasts
 export const getAllPodcasts = async () => {
@@ -60,20 +60,24 @@ export const getPodcastById = async (id: number) => {
 };
 
 // Fonction pour créer un podcast
-export const createPodcast = async (formData: FormData) => {
-  try {
-    const response = await api.post("/podcasts/add", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response.data;
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error("Erreur lors de la création du podcast:", error.response?.data || error.message);
-    } else {
-      console.error("Erreur inconnue :", error);
+export const createPodcast = async (title: string, description: string) => {
+  const token = await AsyncStorage.getItem("auth_token"); // ← CORRECT maintenant
+
+  if (!token) throw new Error("Token non trouvé");
+
+  const response = await axios.post(
+    `${API_BASE_URL}/podcasts/add`,
+    { title, description },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-    throw error;
-  }
+  );
+
+  return response.data;
 };
+
+
 
 export default api;

@@ -2,9 +2,9 @@ import { getAllPodcasts } from "@/services/podcastApi";
 import { useEffect, useState } from "react";
 import { Track } from "react-native-track-player";
 
-const API_BASE_URL = "http://192.168.1.24:3001"; // À remplacer par ton vrai domaine
+const API_BASE_URL = "http://192.168.1.16:3001"; // À remplacer par ton vrai domaine
 
-export const useEpisods = () => {
+export const usePodcasts = () => {
   const [podcasts, setPodcasts] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +21,13 @@ export const useEpisods = () => {
 
         // Transformation des données API en format TrackPlayer
         const formattedData: Track[] = data.map((podcast: any) => ({
-          id: podcast.id?.toString() || Math.random().toString(), // Évite les erreurs si `id` est manquant
-          url: podcast.audioUrl?.startsWith("http") ? podcast.audioUrl : `${API_BASE_URL}${podcast.audioUrl}`,
+          id: podcast.id?.toString(),
+          url: "", // ou un placeholder s'il n'y a pas de preview audio
           title: podcast.title || "Titre inconnu",
-          artist: podcast.channel?.name || "Artiste inconnu",
-          artwork: podcast.artwork /* || "https://via.placeholder.com/150" */, // Utilise l'image fournie si disponible
+          artist: podcast.user?.name || "Auteur inconnu",
+          artwork: podcast.artwork || "https://via.placeholder.com/150",
         }));
+        
 
         setPodcasts(formattedData);
       } catch (err: any) {
