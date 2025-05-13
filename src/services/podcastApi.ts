@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = "http://192.168.1.16:3001"; 
+const API_BASE_URL = "http://192.168.11.37:3001"; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -52,6 +52,20 @@ export const getPodcastById = async (id: number) => {
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("Erreur lors de la récupération du podcast:", error.response?.data || error.message);
+    } else {
+      console.error("Erreur inconnue :", error);
+    }
+    throw error;
+  }
+};
+// Fonction pour récupérer les podcasts de l'utilisateur connecté
+export const getMyPodcasts = async () => {
+  try {
+    const response = await api.get("/podcasts/my");
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Erreur lors de la récupération des podcasts de l'utilisateur :", error.response?.data || error.message);
     } else {
       console.error("Erreur inconnue :", error);
     }

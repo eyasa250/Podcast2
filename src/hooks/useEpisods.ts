@@ -3,7 +3,7 @@ import { useState } from "react";
 import { getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
 import { Track } from "react-native-track-player";
 
-const API_BASE_URL = "http://192.168.1.16:3001";
+const API_BASE_URL = "http://192.168.11.37:3001";
 
 export const useEpisodes = () => {
   const [episodes, setEpisodes] = useState<Track[]>([]);

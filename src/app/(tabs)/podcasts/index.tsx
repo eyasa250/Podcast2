@@ -20,6 +20,12 @@ export default function PodcastScreen() {
       >
         <Text style={{ color: "#007AFF", fontWeight: "bold" }}>+ Nouveau podcast</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={{ marginBottom: 20, alignSelf: "flex-end" }}
+        onPress={() => router.push("/(tabs)/podcasts/stepper")}
+      >
+        <Text style={{ color: "#007AFF", fontWeight: "bold" }}>+ Nouveau episode</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={podcasts}

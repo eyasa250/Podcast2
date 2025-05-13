@@ -1,13 +1,15 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet} from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { ResizeMode, Video } from 'expo-av';
+import { EpisodeFormData } from '@/hooks/useEpisodeForm';
 
 const StepDetails = ({
   formData,
   setFormData,
 }: {
   formData: EpisodeFormData;
-  setFormData: React.Dispatch<React.SetStateAction<EpisodeFormData>>;
-})  => {
+  setFormData: (field: keyof EpisodeFormData, value: any) => void;
+}) => {
   const { videoData, title, description, playlist } = formData;
 
   return (
@@ -17,7 +19,7 @@ const StepDetails = ({
         style={styles.input}
         placeholder="Titre de l'épisode"
         value={title}
-        onChangeText={(text) => setFormData({ ...formData, title: text })}
+        onChangeText={(text) => setFormData('title', text)}
       />
 
       <Text style={styles.label}>Description</Text>
@@ -26,26 +28,16 @@ const StepDetails = ({
         placeholder="Décrivez l'épisode..."
         multiline
         value={description}
-        onChangeText={(text) => setFormData({ ...formData, description: text })}
+        onChangeText={(text) => setFormData('description', text)}
       />
 
-      <Text style={styles.label}>Playlist</Text>
+      <Text style={styles.label}>Podcast</Text>
       <TextInput
         style={styles.input}
         placeholder="Nom de la playlist"
         value={playlist}
-        onChangeText={(text) => setFormData({ ...formData, playlist: text })}
+        onChangeText={(text) => setFormData('playlist', text)}
       />
-
-      <Text style={styles.label}>Audience</Text>
-      <Picker
-        selectedValue={audience}
-        onValueChange={(value) => setFormData({ ...formData, audience: value })}
-        style={styles.input}
-      >
-        <Picker.Item label="Oui, c’est pour les enfants" value="kids" />
-        <Picker.Item label="Non, ce n’est pas pour les enfants" value="general" />
-      </Picker>
 
       {videoData?.uri && (
         <View style={styles.previewContainer}>
@@ -54,17 +46,13 @@ const StepDetails = ({
             source={{ uri: videoData.uri }}
             style={{ width: '100%', height: 200 }}
             useNativeControls
-           resizeMode={ResizeMode.CONTAIN} />
-         
+            resizeMode={ResizeMode.CONTAIN}
+          />
         </View>
       )}
     </View>
   );
 };
-
-import { ResizeMode, Video } from 'expo-av';
-import { EpisodeFormData } from '@/hooks/useEpisodeForm';
-import { Picker } from '@react-native-picker/picker';
 
 const styles = StyleSheet.create({
   container: { padding: 16 },

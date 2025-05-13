@@ -5,10 +5,10 @@ import { View } from 'react-native';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import StepDetails from '@/components/StepDetails';
 import StepVerification from '@/components/StepVerification';
-import StepOptions from '@/components/stepOptions';
 import StepSubtitles from '@/components/StepSubtitles';
 import StepUpload from '@/components/StepUpload';
 import useEpisodeForm from '@/hooks/useEpisodeForm';
+import StepOptions from '@/components/StepOptions';
 
 const StepperScreen = () => {
 
