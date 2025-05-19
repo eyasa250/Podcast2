@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
-import { TracksList } from "@/components/TracksList";
+import { EpisodeList } from "@/components/EpisodeList";
 import library from "@/assets/library.json";  // Personnalisez ici aussi
 
 const ToGetStarted = ({ episods }: { episods: any[] }) => {
@@ -10,7 +10,7 @@ const ToGetStarted = ({ episods }: { episods: any[] }) => {
         To Get Started
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <TracksList data={episods} />
+        <EpisodeList data={episods} />
       </ScrollView>
     </View>
   );

@@ -6,14 +6,16 @@ import RecentlyPlayed from "@/components/RecentlyPlayed";
 import ToGetStarted from "@/components/ToGetStarted";
 import TrySomethingElse from "@/components/TrySomethingElse";
 import TodayBiggestHits from "@/components/TodayBiggestHits";
-import { TracksList } from "@/components/TracksList";
+import { usePodcasts } from "@/hooks/usePodcasts";
 
 const HomeScreen = () => {
   const { episodes, loading, error, fetchAllEpisodes } = useEpisodes();
+  const { podcasts } = usePodcasts();
 
   useEffect(() => {
     fetchAllEpisodes();
   }, []);
+
   return (
     <View style={{ flex: 1 }}>
       {loading ? (
@@ -23,15 +25,24 @@ const HomeScreen = () => {
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ paddingHorizontal: 10 }}>
           {/* Affichage de la liste des Episods */}
-    {/*       <TracksList data={Episods} /> */}
+    {/*       <EpisodeList data={Episods} /> */}
           
-          {/* Logs pour vérifier les données passées à chaque composant */}
-          {episodes && episodes.length > 0 ? (
+      {/*     {episodes && episodes.length > 0 ? (
             <>
               <RecentlyPlayed episods={episodes} />
               <ToGetStarted episods={episodes} />
               <TrySomethingElse episods={episodes} />
               <TodayBiggestHits episods={episodes} />
+            </>
+          ) : (
+            <Text style={{ textAlign: "center", marginTop: 20 }}>No Episods available</Text>
+          )} */}
+              {podcasts && podcasts.length > 0 ? (
+            <>
+              <RecentlyPlayed data={podcasts} />
+              <ToGetStarted episods={podcasts} />
+              <TrySomethingElse episods={podcasts} />
+              <TodayBiggestHits episods={podcasts} />
             </>
           ) : (
             <Text style={{ textAlign: "center", marginTop: 20 }}>No Episods available</Text>

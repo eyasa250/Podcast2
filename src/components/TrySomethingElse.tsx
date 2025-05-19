@@ -1,7 +1,7 @@
 // TrySomethingElse.tsx
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
-import { TracksList } from "@/components/TracksList";
+import { EpisodeList } from "@/components/EpisodeList";
 import library from "@/assets/library.json";  // Personnalisez ici aussi
 
 const TrySomethingElse = ({ episods }: { episods: any[] }) => {
@@ -11,7 +11,7 @@ const TrySomethingElse = ({ episods }: { episods: any[] }) => {
         Try Something Else
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <TracksList data={episods} />
+        <EpisodeList data={episods} />
       </ScrollView>
     </View>
   );

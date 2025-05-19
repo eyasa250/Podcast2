@@ -1,38 +1,47 @@
-// hooks/useEpisodeForm.ts
 import { useState } from 'react';
 
 export type EpisodeFormData = {
-    title: string;
-    description: string;
-    videoData: {
-      uri: string;
-    } | null;
-    playlist: string;
-    /* audience: string;
-    tags: string;
-    language: string; */
-  };
-  
+  title: string;
+  description: string;
+  videoData: {
+    uri: string;
+    name: string;
+  } | null;
+  coverImage: {
+    uri: string;
+  } | null;
+  audience: string;
+  tags: string[];
+  subtitlesEnabled: boolean;
+  soundEnhancementEnabled: boolean;
+  trackType: 'AUDIO' | 'VIDEO';
+
+};
+
+const initialFormData: EpisodeFormData = {
+  title: '',
+  description: '',
+  videoData: null,
+  coverImage: null,
+  audience: 'GENERAL',
+  tags: [],
+  subtitlesEnabled: false,
+  soundEnhancementEnabled: false,
+  trackType: 'AUDIO'
+
+};
 
 export default function useEpisodeForm() {
-    const [formData, setFormData] = useState<EpisodeFormData>({
-        title: '',
-        description: '',
-        videoData: null,
-        playlist: '',
-       /*  audience: '',
-        tags: '',
-        language: '', */
-      });
-      
-  const updateVideoData = (uri: string) => {
+  const [formData, setFormData] = useState<EpisodeFormData>(initialFormData);
+
+  const updateVideoData = (video: { uri: string; name: string }) => {
     setFormData((prev) => ({
       ...prev,
-      videoData: { uri},
+      videoData: video,
     }));
   };
 
-  const updateField = (field: keyof EpisodeFormData, value: any) => {
+  const updateField = <K extends keyof EpisodeFormData>(field: K, value: EpisodeFormData[K]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -40,15 +49,7 @@ export default function useEpisodeForm() {
   };
 
   const resetForm = () => {
-    setFormData({
-        title: '',
-        description: '',
-        videoData: null,
-        playlist: '',
-       /*  audience: '',
-        tags: '',
-        language: '', */
-    });
+    setFormData(initialFormData);
   };
 
   return {

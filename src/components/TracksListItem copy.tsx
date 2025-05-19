@@ -4,15 +4,15 @@ import { View, Text, Image, StyleSheet, TouchableHighlight } from 'react-native'
 import { Card } from 'react-native-paper';
 import { Track, useActiveTrack } from 'react-native-track-player';
 
-export type TracksListItemProps = {
+export type EpisodeListItemProps = {
   track: Track;
   onTrackSelect: (track: Track) => void;
 };
 
-export const TracksListItem = ({
+export const EpisodeListItem = ({
   track,
   onTrackSelect: handleTrackSelect,
-}: TracksListItemProps) => {
+}: EpisodeListItemProps) => {
   const isActiveTrack = useActiveTrack()?.url === track.url;
 
   return (

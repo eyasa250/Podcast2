@@ -1,84 +1,63 @@
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { usePodcasts } from "@/hooks/usePodcasts";
+import { PodcastGrid } from "@/components/PodcastGrid";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function PodcastScreen() {
   const router = useRouter();
-  const { podcasts, loading, error } = usePodcasts();
+  const { podcasts, loading, error } = usePodcasts({ own: true });
 
-  if (loading) return <Text>Chargement des podcasts...</Text>;
-  if (error) return <Text>Erreur : {error}</Text>;
+  if (loading) return <Text>Loading your podcasts...</Text>;
+  if (error) return <Text>Error: {error}</Text>;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Podcasts disponibles</Text>
 
-      <TouchableOpacity
-        style={{ marginBottom: 20, alignSelf: "flex-end" }}
-        onPress={() => router.push("/(tabs)/podcasts/create")}
-      >
-        <Text style={{ color: "#007AFF", fontWeight: "bold" }}>+ Nouveau podcast</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+<TouchableOpacity style={styles.fab} onPress={() => router.push("/(tabs)/podcasts/create")}>
+  <Ionicons name="add" size={24} color="#fff" />
+</TouchableOpacity>
+
+{/*       <TouchableOpacity
         style={{ marginBottom: 20, alignSelf: "flex-end" }}
         onPress={() => router.push("/(tabs)/podcasts/stepper")}
       >
-        <Text style={{ color: "#007AFF", fontWeight: "bold" }}>+ Nouveau episode</Text>
-      </TouchableOpacity>
+        <Text style={styles.link}>+ New Episode</Text>
+      </TouchableOpacity> */}
 
-      <FlatList
-        data={podcasts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-          onPress={() => {
-        //    console.log("Podcast ID sélectionné :", item.id); // 👈 Log ici
-         //  router.push({ pathname: "/(tabs)/podcasts/[id]", params: { id: item.id } });
-         router.push({ pathname: "/(tabs)/podcasts/podcastEp"})  }}
-          style={styles.episodeItem}
-        >
-        
-            <Image
-              source={{ uri: item.artwork || "https://via.placeholder.com/50" }}
-              style={{ width: 50, height: 50, borderRadius: 5 }}
-            />
-            <View style={{ flex: 1, marginLeft: 10 }}>
-              <Text style={styles.episodeTitle}>{item.title}</Text>
-              <Text style={styles.episodeDuration}>Par {item.artist || "Inconnu"}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="gray" />
-          </TouchableOpacity>
-        )}
-      />
+      <PodcastGrid data={podcasts} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#f4f4f4",
-    padding: 20,
+    position: "absolute",
+    // On prend une marge en bas ET en haut pour rester centré entre les deux barres
+    bottom: 100, // Ajuste selon la hauteur de ta TabBar
+    right: 20,
+    alignItems: "center",
+  },
+  fab: {
+    backgroundColor: "#007AFF",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
   },
-  episodeItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  episodeTitle: {
-    fontSize: 16,
+  link: {
+    color: "#007AFF",
     fontWeight: "bold",
-  },
-  episodeDuration: {
-    fontSize: 14,
-    color: "gray",
   },
 });

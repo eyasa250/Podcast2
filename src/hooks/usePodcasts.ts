@@ -1,42 +1,65 @@
 import { useEffect, useState } from "react";
-import { getAllPodcasts } from "@/services/podcastApi";  // Assure-toi que cette API est correcte
-import { Podcast } from "@/types"; // Importer les types Podcast et Episode
+import { getAllPodcasts, getPodcastsByUser } from "@/services/podcastApi";
+import { Podcast } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const usePodcasts = () => {
-  const [podcasts, setPodcasts] = useState<Podcast[]>([]); // Met à jour pour utiliser le type Podcast
+type UsePodcastsOptions = {
+  own?: boolean; // true => fetch only podcasts of the logged-in user
+  userId?: string; // option to specify a specific userId
+};
+
+const formatPodcastsData = (data: any[]): Podcast[] =>
+  data.map((podcast) => ({
+    id: podcast.id?.toString(),
+    title: podcast.title || "Unknown title",
+    description: podcast.description || "No description",
+    category: podcast.category || "No category",
+    image:podcast.image,
+    author: podcast.user?.name || "Unknown author",
+  }));
+
+export const usePodcasts = (options: UsePodcastsOptions = {}) => {
+  const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getAllPodcasts(); // Appel API pour récupérer les podcasts
+  const fetchPodcasts = async () => {
+    setLoading(true);
+    setError(null);
 
-        // Vérifie que `data` est bien un tableau de podcasts avant de le mapper
-        if (!Array.isArray(data)) {
-          throw new Error("Données invalides reçues de l'API");
-        }
+    try {
+      let data;
+      if (options.own) {
+        const userJson = await AsyncStorage.getItem("user");
+        if (!userJson) throw new Error("User not logged in");
 
-        // Transformation des données API en format Podcast
-        const formattedData: Podcast[] = data.map((podcast: any) => ({
-          id: podcast.id?.toString(),
-          title: podcast.title || "Titre inconnu",
-          description: podcast.description || "Pas de description",
-          artwork: podcast.artwork || "https://via.placeholder.com/150",
-          author: podcast.user?.name || "Auteur inconnu",
-        }));
-
-        setPodcasts(formattedData); // Mise à jour de l'état avec les podcasts formatés
-      } catch (err: any) {
-        console.error("Erreur lors de la récupération des podcasts:", err);
-        setError(err.message || "Impossible de récupérer les podcasts");
-      } finally {
-        setLoading(false);
+        const user = JSON.parse(userJson);
+        const userId = user.id;
+        if (!userId) throw new Error("User not logged in");
+        data = await getPodcastsByUser(userId);
+      } else if (options.userId) {
+        data = await getPodcastsByUser(options.userId);
+      } else {
+        data = await getAllPodcasts();
       }
-    };
 
-    fetchData(); // Appel de la fonction de récupération des podcasts
-  }, []);
+      setPodcasts(formatPodcastsData(data));
+    } catch (err: any) {
+      setError(err.message || "Error retrieving podcasts");
+      console.error("API Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { podcasts, loading, error }; // Retourner les podcasts, loading et error
+  useEffect(() => {
+    fetchPodcasts();
+  }, [options.own, options.userId]);
+
+  return {
+    podcasts,
+    loading,
+    error,
+    refetch: fetchPodcasts,
+  };
 };

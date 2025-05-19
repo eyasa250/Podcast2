@@ -1,3 +1,5 @@
+import { Image } from "react-native-reanimated/lib/typescript/Animated";
+
 declare module '*.png'
 declare module '*.jpg'
 // types.ts ou un autre fichier d'interface
@@ -10,12 +12,13 @@ export interface Episode {
     podcastId?: string;
   }
   
-  export interface Podcast {
-    id: string;
-    title: string;
-    description: string;
-    artwork?: string;
-    author?: string;
-    episodes?: Episode[]; // Liste d'épisodes (optionnelle)
-  }
+export interface Podcast {
+  id: string;
+  title: string;
+  description: string;
+  category: string
+  author: string;
+  image: Image;
+}
+
   

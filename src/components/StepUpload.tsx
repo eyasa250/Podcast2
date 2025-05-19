@@ -1,47 +1,50 @@
-// StepUpload.tsx
 import { Video, ResizeMode } from 'expo-av';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-export default function StepUpload({ formData, setFormData }: any) {
+export default function StepUpload({ formData, updateVideoData }: any) {
   const [videoUri, setVideoUri] = useState<string | null>(formData.videoData?.uri || null);
-  const [videoName, setVideoName] = useState('');
+  const [videoName, setVideoName] = useState(formData.videoData?.name || '');
+  const [loading, setLoading] = useState(false);
 
   const pickVideo = async () => {
+    setLoading(true);
     const result = await DocumentPicker.getDocumentAsync({
       type: 'video/*',
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets.length > 0) {
       const uri = result.assets[0].uri;
       const name = result.assets[0].name;
 
       setVideoUri(uri);
       setVideoName(name);
 
-      // Mettre à jour formData
-      setFormData((prev: any) => ({
-        ...prev,
-        videoData: { uri },
-      }));
+      updateVideoData({ uri, name }); // ✅ Met à jour via le hook useEpisodeForm
     }
+    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.dropZone} onPress={pickVideo}>
+      <TouchableOpacity style={styles.dropZone} onPress={pickVideo} disabled={loading}>
+        <Icon name="cloud-upload-outline" size={40} color="#aaa" />
         <Text style={styles.text}>
           {videoName || videoUri ? 'Changer la vidéo' : 'Sélectionner une vidéo'}
         </Text>
+        {videoName ? <Text style={styles.fileName}>{videoName}</Text> : null}
       </TouchableOpacity>
 
-      {videoUri && (
+      {loading && <ActivityIndicator size="large" color="#1db954" style={{ marginTop: 20 }} />}
+
+      {videoUri && !loading && (
         <Video
           source={{ uri: videoUri }}
           resizeMode={ResizeMode.CONTAIN}
           useNativeControls
-          style={{ width: '100%', height: 200, marginTop: 20 }}
+          style={styles.video}
         />
       )}
     </View>
@@ -51,14 +54,46 @@ export default function StepUpload({ formData, setFormData }: any) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    flex: 1,
+    justifyContent: 'flex-start',
   },
   dropZone: {
-    backgroundColor: '#1e1e1e',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 25,
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   text: {
+    color: '#ccc',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  fileName: {
+    color: '#888',
+    marginTop: 5,
+    fontSize: 14,
+  },
+  video: {
+    width: '100%',
+    height: 220,
+    marginTop: 20,
+    borderRadius: 12,
+  },
+  nextButton: {
+    marginTop: 40,
+    backgroundColor: '#1db954',
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#555',
+  },
+  nextButtonText: {
     color: '#fff',
+    fontWeight: '700',
+    fontSize: 18,
   },
 });

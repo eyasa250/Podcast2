@@ -1,9 +1,9 @@
 // hooks/useEpisodes.ts
 import { useState } from "react";
-import { getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
+import { createEpisod, getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
 import { Track } from "react-native-track-player";
 
-const API_BASE_URL = "http://192.168.11.37:3001";
+const API_BASE_URL = "http://192.168.1.20:3001";
 
 export const useEpisodes = () => {
   const [episodes, setEpisodes] = useState<Track[]>([]);
@@ -51,12 +51,37 @@ export const useEpisodes = () => {
       setLoading(false);
     }
   };
-
+  const createEpisode = async (podcastId: number | string, formData: FormData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const newEpisode = await createEpisod(podcastId, formData);
+      setEpisodes((prev) => [...prev, {
+        id: newEpisode.id?.toString() || Math.random().toString(),
+        url: newEpisode.audioUrl?.startsWith("http")
+          ? newEpisode.audioUrl
+          : `${API_BASE_URL}${newEpisode.audioUrl}`,
+        title: newEpisode.title || "Titre inconnu",
+        artist: newEpisode.podcast?.name || "Artiste inconnu",
+        artwork: newEpisode.artwork,
+        languageTranscriptions: newEpisode.transcriptionUrls || {},
+      }]);
+      return newEpisode;
+    } catch (err: any) {
+      console.error("Erreur createEpisode:", err.message);
+      setError(err.message || "Erreur de création");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return {
     episodes,
     loading,
     error,
     fetchAllEpisodes,
-    fetchEpisodesByPodcastId,
+    fetchEpisodesByPodcastId,  createEpisode, // 👈 Ajouter ceci
+
   };
 };

@@ -1,9 +1,9 @@
-import { TracksList } from "@/components/TracksList";
 import { useEpisodes } from "@/hooks/useEpisods";
 import { getEpisodesByPodcastId } from "@/services/episodeApi";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
+import { EpisodeList } from "@/components/EpisodeList";
 
 export default function PodcastDetailScreen() {
   const { id } = useLocalSearchParams(); // Peut être string ou string[]
@@ -19,7 +19,7 @@ export default function PodcastDetailScreen() {
 
   return (
     <View style={{ padding: 16 }}>
-      <TracksList
+      <EpisodeList
         data={episodes}
       
       />

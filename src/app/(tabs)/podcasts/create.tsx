@@ -1,37 +1,44 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { createPodcast } from "@/services/podcastApi"; // ⚠️ Assure-toi que le chemin est correct
+import { Picker } from "@react-native-picker/picker";
+import { createPodcast } from "@/services/podcastApi"; // ⚠️ Make sure the path is correct
 
-export default function CreatepodcastScreen() {
+export default function CreatePodcastScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const router = useRouter();
 
   const handleCreate = async () => {
     if (!title.trim()) {
-      Alert.alert("Erreur", "Le nom de la podcast est requis.");
+      Alert.alert("Error", "Podcast title is required.");
+      return;
+    }
+
+    if (!category) {
+      Alert.alert("Error", "Please select a category.");
       return;
     }
 
     try {
-      const newPodcast = await createPodcast(title, description);
-      console.log("Podcast créé :", newPodcast);
-      Alert.alert("Succès", "Podcast créée avec succès !");
-      router.push("/(tabs)/podcasts"); // Redirection vers la liste
+      const newPodcast = await createPodcast(title, description, category);
+      console.log("Podcast created:", newPodcast);
+      Alert.alert("Success", "Podcast created successfully!");
+      router.push("/(tabs)/podcasts");
     } catch (error: any) {
-      console.error("Erreur API:", error);
-      Alert.alert("Erreur", error?.response?.data?.message || "Échec de la création du podcast.");
+      console.error("API error:", error);
+      Alert.alert("Error", error?.response?.data?.message || "Failed to create podcast.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Créer une nouvelle podcast</Text>
+      <Text style={styles.header}>Create a New Podcast</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Nom de la podcast"
+        placeholder="Podcast title"
         placeholderTextColor="#888"
         value={title}
         onChangeText={setTitle}
@@ -39,7 +46,7 @@ export default function CreatepodcastScreen() {
 
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Description (optionnelle)"
+        placeholder="Description (optional)"
         placeholderTextColor="#888"
         value={description}
         onChangeText={setDescription}
@@ -47,8 +54,23 @@ export default function CreatepodcastScreen() {
         numberOfLines={4}
       />
 
+      <Text style={styles.label}>Category</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={category}
+          onValueChange={(itemValue) => setCategory(itemValue)}
+        >
+          <Picker.Item label="Select a category..." value="" />
+          <Picker.Item label="Education" value="EDUCATION" />
+          <Picker.Item label="Entertainment" value="ENTERTAINMENT" />
+          <Picker.Item label="Technology" value="TECHNOLOGY" />
+          <Picker.Item label="Health" value="HEALTH" />
+          <Picker.Item label="Music" value="MUSIC" />
+        </Picker>
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={handleCreate}>
-        <Text style={styles.buttonText}>Créer</Text>
+        <Text style={styles.buttonText}>Create</Text>
       </TouchableOpacity>
     </View>
   );
@@ -76,6 +98,16 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     textAlignVertical: "top",
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: "500",
+  },
+  pickerContainer: {
+    backgroundColor: "#f1f1f1",
+    borderRadius: 8,
+    marginBottom: 15,
   },
   button: {
     backgroundColor: "#007AFF",

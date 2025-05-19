@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, Text, ActivityIndicator } from "react-native";
 import { useSearchBar } from "@/hooks/useSearchBar";
-import { TracksList } from "@/components/TracksList";
-import { useEpisods } from "@/hooks/useEpisods";
+import { useEpisodes } from "@/hooks/useEpisods";
+import { EpisodeList } from "@/components/EpisodeList";
 
 const SearchScreen: React.FC = () => {
   const { search, SearchBarComponent } = useSearchBar();
   const [filteredTracks, setFilteredTracks] = useState<any[]>([]);
-  const { Episods, loading, error } = useEpisods();
+  const { episodes, loading, error } = useEpisodes();
 
   useEffect(() => {
     if (search.length === 0) {
       setFilteredTracks([]);
     } else {
-      const filtered = Episods.filter(
+      const filtered = episodes.filter(
         (track) =>
           track?.title && track.title.toLowerCase().includes(search.toLowerCase()) ||
           (track?.artist && track.artist.toLowerCase().includes(search.toLowerCase()))
       );
       setFilteredTracks(filtered);
     }
-  }, [search, Episods]);
+  }, [search, episodes]);
   
   return (
     <View style={{ flex: 1, paddingHorizontal: 10 }}>
@@ -33,7 +33,7 @@ const SearchScreen: React.FC = () => {
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic">
           {filteredTracks.length > 0 ? (
-            <TracksList data={filteredTracks} />
+            <EpisodeList data={filteredTracks} />
           ) : (
             <View style={{ alignItems: "center", marginTop: 40 }}>
               <Text style={{ fontSize: 18, color: "gray" }}>No Podcasts found</Text>

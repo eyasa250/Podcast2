@@ -1,16 +1,24 @@
+import { useAuth } from "@/hooks/useAuth";
 import { router, Stack } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 
 export default function PaymentScreen() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [name, setName] = useState("");
+  const { upgradeRole, loading } = useAuth();
 
-  const handlePayment = () => {
+  const handlePayment  = async ()=> {
     // Logique de paiement (par exemple, appel API pour payer)
     console.log("Détails de paiement:", { cardNumber, expiryDate, cvv, name });
+      try {
+      await upgradeRole(); // 🔁 mise à jour du rôle
+      router.replace("/profile"); // ✅ redirection après succès
+    } catch (err) {
+      Alert.alert("Erreur", "Le paiement a échoué ou le rôle n'a pas pu être mis à jour.");
+    }
   };
 
   return (
@@ -62,7 +70,7 @@ export default function PaymentScreen() {
           </View>
 
           {/* Bouton de paiement */}
-          <TouchableOpacity style={styles.button} onPress={() => router.push("/profile")}>
+          <TouchableOpacity style={styles.button}  onPress={handlePayment}  disabled={loading}>
             <Text style={styles.buttonText}>Payer maintenant</Text>
           </TouchableOpacity>
         </View>
