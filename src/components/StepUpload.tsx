@@ -3,13 +3,17 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import * as DocumentPicker from 'expo-document-picker';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-export default function StepUpload({ formData, updateVideoData }: any) {
-  const [videoUri, setVideoUri] = useState<string | null>(formData.videoData?.uri || null);
-  const [videoName, setVideoName] = useState(formData.videoData?.name || '');
+import { EpisodeFormData } from '@/types';
+interface StepUploadProps {
+  formData: EpisodeFormData;
+  setMediaFile: (data: { uri: string; name: string }) => void;
+}
+export default function StepUpload({ formData, setMediaFile }: StepUploadProps) {
+  const [videoUri, setVideoUri] = useState<string | null>(formData.mediaFile?.uri || null);
+  const [videoName, setVideoName] = useState(formData.mediaFile?.name || '');
   const [loading, setLoading] = useState(false);
 
-  const pickVideo = async () => {
+ /*  const pickVideo = async () => {
     setLoading(true);
     const result = await DocumentPicker.getDocumentAsync({
       type: 'video/*',
@@ -25,11 +29,16 @@ export default function StepUpload({ formData, updateVideoData }: any) {
       updateVideoData({ uri, name }); // ✅ Met à jour via le hook useEpisodeForm
     }
     setLoading(false);
+  }; */
+  const pickMediaFile = async () => {
+    const result = await DocumentPicker.getDocumentAsync({ type: 'video/*' });
+    if (!result.canceled && result.assets.length > 0) {
+      setMediaFile(result.assets[0]);
+    }
   };
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.dropZone} onPress={pickVideo} disabled={loading}>
+      <TouchableOpacity style={styles.dropZone} onPress={pickMediaFile} disabled={loading}>
         <Icon name="cloud-upload-outline" size={40} color="#aaa" />
         <Text style={styles.text}>
           {videoName || videoUri ? 'Changer la vidéo' : 'Sélectionner une vidéo'}

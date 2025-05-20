@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
 
 const StepSubtitles = () => {
-  const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
-  const [soundEnhancementEnabled, setSoundEnhancementEnabled] = useState(false);
+  const [subtitles, setsubtitles] = useState(true);
+  const [soundEnhancement, setsoundEnhancement] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -16,8 +16,8 @@ const StepSubtitles = () => {
       <View style={styles.toggleContainer}>
         <Text style={styles.label}>Sous-titres automatiques</Text>
         <Switch
-          value={subtitlesEnabled}
-          onValueChange={setSubtitlesEnabled}
+          value={subtitles}
+          onValueChange={setsubtitles}
         />
       </View>
 
@@ -25,8 +25,8 @@ const StepSubtitles = () => {
       <View style={styles.toggleContainer}>
         <Text style={styles.label}>Amélioration du son</Text>
         <Switch
-          value={soundEnhancementEnabled}
-          onValueChange={setSoundEnhancementEnabled}
+          value={soundEnhancement}
+          onValueChange={setsoundEnhancement}
         />
       </View>
     </View>

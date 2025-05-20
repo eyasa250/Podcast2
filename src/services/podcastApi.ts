@@ -17,7 +17,7 @@ api.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Headers envoyés:", config.headers); // Ajout du log
+  //    console.log("Headers envoyés:", config.headers); // Ajout du log
 
     }else
      {  

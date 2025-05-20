@@ -15,7 +15,7 @@ export default function PaymentScreen() {
     console.log("Détails de paiement:", { cardNumber, expiryDate, cvv, name });
       try {
       await upgradeRole(); // 🔁 mise à jour du rôle
-      router.replace("/profile"); // ✅ redirection après succès
+      router.replace("/home"); // ✅ redirection après succès
     } catch (err) {
       Alert.alert("Erreur", "Le paiement a échoué ou le rôle n'a pas pu être mis à jour.");
     }

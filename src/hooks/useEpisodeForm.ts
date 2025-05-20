@@ -1,61 +1,32 @@
-import { useState } from 'react';
+import { EpisodeFormData } from "@/types";
+import { useState } from "react";
 
-export type EpisodeFormData = {
-  title: string;
-  description: string;
-  videoData: {
-    uri: string;
-    name: string;
-  } | null;
-  coverImage: {
-    uri: string;
-  } | null;
-  audience: string;
-  tags: string[];
-  subtitlesEnabled: boolean;
-  soundEnhancementEnabled: boolean;
-  trackType: 'AUDIO' | 'VIDEO';
+export const useEpisodeForm = () => {
+  const [formData, setFormDataState] = useState<EpisodeFormData>({
+    title: '',
+    description: '',
+    trackType: 'AUDIO',
+    audience: 'GENERAL',
+    subtitles: false,
+    soundEnhancement: false,
+    tags: [],
+    mediaFile: null,
+    imageFile: null,
+  });
 
-};
-
-const initialFormData: EpisodeFormData = {
-  title: '',
-  description: '',
-  videoData: null,
-  coverImage: null,
-  audience: 'GENERAL',
-  tags: [],
-  subtitlesEnabled: false,
-  soundEnhancementEnabled: false,
-  trackType: 'AUDIO'
-
-};
-
-export default function useEpisodeForm() {
-  const [formData, setFormData] = useState<EpisodeFormData>(initialFormData);
-
-  const updateVideoData = (video: { uri: string; name: string }) => {
-    setFormData((prev) => ({
-      ...prev,
-      videoData: video,
-    }));
-  };
-
-  const updateField = <K extends keyof EpisodeFormData>(field: K, value: EpisodeFormData[K]) => {
-    setFormData((prev) => ({
+  const updateField = <K extends keyof EpisodeFormData>(
+    field: K,
+    value: EpisodeFormData[K]
+  ) => {
+    setFormDataState((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const resetForm = () => {
-    setFormData(initialFormData);
-  };
-
   return {
     formData,
-    updateVideoData,
     updateField,
-    resetForm,
+    
   };
-}
+};

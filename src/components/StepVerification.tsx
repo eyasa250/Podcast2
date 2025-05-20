@@ -1,24 +1,23 @@
-import { EpisodeFormData } from '@/hooks/useEpisodeForm';
+import { EpisodeFormData } from '@/types';
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Video from 'react-native-video';
 
 const StepVerification = ({
   formData,
-  setFormData,
 }: {
   formData: EpisodeFormData;
   setFormData: (field: keyof EpisodeFormData, value: any) => void;
 }) => {
   const coverUri =
-    typeof formData.coverImage === 'string'
-      ? formData.coverImage
-      : formData.coverImage?.uri;
+    typeof formData.imageFile === 'string'
+      ? formData.imageFile
+      : formData.imageFile?.uri;
 
   const videoUri =
-    typeof formData.videoData === 'string'
-      ? formData.videoData
-      : formData.videoData?.uri;
+    typeof formData.mediaFile === 'string'
+      ? formData.mediaFile
+      : formData.mediaFile?.uri;
 
   return (
     <View style={styles.container}>

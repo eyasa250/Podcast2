@@ -2,18 +2,21 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ResizeMode, Video } from 'expo-av';
-import { EpisodeFormData } from '@/hooks/useEpisodeForm';
+import { EpisodeFormData } from '@/types';
+import * as DocumentPicker from 'expo-document-picker';
 
-const StepDetails = ({
-  formData,
-  setFormData,
-}: {
+interface StepDetailsProps {
   formData: EpisodeFormData;
-  setFormData: (field: keyof EpisodeFormData, value: any) => void;
-}) => {
-  const { videoData, title, description, coverImage } = formData;
+  setFormData: <K extends keyof EpisodeFormData>(
+    field: K,
+    value: EpisodeFormData[K]
+  ) => void;
+}
+const StepDetails = ({ formData, setFormData }: StepDetailsProps) => {
 
-  const pickCoverImage = async () => {
+  const { mediaFile, title, description, imageFile } = formData;
+
+  /* const pickimageFile = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
@@ -27,10 +30,15 @@ const StepDetails = ({
     });
 
     if (!result.canceled && result.assets && result.assets[0]) {
-      setFormData('coverImage', { uri: result.assets[0].uri });
+      setFormData('imageFile', { uri: result.assets[0].uri });
     }
-  };
-
+  }; */
+const pickImageFile = async () => {
+  const result = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
+  if (!result.canceled && result.assets.length > 0) {
+    setFormData('imageFile', result.assets[0]);
+  }
+};
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Titre</Text>
@@ -53,20 +61,20 @@ const StepDetails = ({
       />
 
       <Text style={styles.label}>Image de couverture</Text>
-      {coverImage?.uri ? (
-        <Image source={{ uri: coverImage.uri }} style={styles.coverImage} />
+      {imageFile?.uri ? (
+        <Image source={{ uri: imageFile.uri }} style={styles.imageFile} />
       ) : (
         <Text style={{ color: '#999' }}>Aucune image sélectionnée</Text>
       )}
-      <Pressable onPress={pickCoverImage} style={styles.coverButton}>
+      <Pressable onPress={pickImageFile} style={styles.coverButton}>
         <Text style={styles.coverButtonText}>Choisir une image</Text>
       </Pressable>
 
-      {videoData?.uri && (
+      {mediaFile?.uri && (
         <View style={styles.previewContainer}>
           <Text style={styles.label}>Preview Vidéo</Text>
           <Video
-            source={{ uri: videoData.uri }}
+            source={{ uri: mediaFile.uri }}
             style={styles.video}
             useNativeControls
             resizeMode={ResizeMode.CONTAIN}
@@ -108,7 +116,7 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
-  coverImage: {
+  imageFile: {
     width: '100%',
     height: 180,
     borderRadius: 12,

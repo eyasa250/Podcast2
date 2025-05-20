@@ -1,56 +1,94 @@
-import axios, { AxiosError } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-const API_BASE_URL = "http://192.20.1.20:3001"; // remplace si besoin
+const API_BASE_URL = "http://192.168.1.20:3001";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-
 });
+/* export const uploadEpisode = async (
+  podcastId: string,
+  episodeData: {
+    title: string;
+    description: string;
+    trackType: 'AUDIO' | 'VIDEO';
+    audience: 'GENERAL' | 'ADULT';
+    subtitles: boolean;
+    soundEnhancement: boolean;
+    tags: string[];
+    mediaFile: any;
+    imageFile?: any;
+  }
+) => {
+  const formData = new FormData();
 
-// Fonction pour récupérer tous les Episods
+  formData.append('title', episodeData.title);
+  formData.append('description', episodeData.description);
+  formData.append('trackType', episodeData.trackType);
+  formData.append('audience', episodeData.audience);
+  formData.append('subtitles', episodeData.subtitles.toString());
+  formData.append('soundEnhancement', episodeData.soundEnhancement.toString());
+
+  episodeData.tags.forEach(tag => {
+    formData.append('tags[]', tag);
+  });
+
+  formData.append('files', {
+    uri: episodeData.mediaFile.uri,
+    name: episodeData.mediaFile.name,
+    type: episodeData.mediaFile.mimeType || (episodeData.trackType === 'AUDIO' ? 'audio/mpeg' : 'video/mp4'),
+  } as any);
+
+  if (episodeData.imageFile) {
+    formData.append('files', {
+      uri: episodeData.imageFile.uri,
+      name: episodeData.imageFile.name,
+      type: episodeData.imageFile.mimeType || 'image/jpeg',
+    } as any);
+  }
+
+  const response = await fetch(`http://192.168.1.20:3001/episodes/${podcastId}/add`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json();
+  return data;
+}; */
+export const uploadEpisode = async (podcastId: string, formData: FormData) => {
+  const response = await fetch(`http://192.168.1.20:3001/episodes/${podcastId}/add`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 export const getAllEpisods = async () => {
   try {
     const response = await api.get("/episodes");
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Erreur réponse API :", error.response?.data || error.message);
+      console.error("Erreur API:", error.response?.data || error.message);
     } else {
-      console.error("Erreur inconnue :", error);
+      console.error("Erreur inconnue:", error);
     }
     throw error;
   }
 };
 
-// Fonction pour récupérer un Episod par ID
 export const getEpisodById = async (id: number) => {
   try {
     const response = await api.get(`/episodes/${id}`);
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Erreur lors de la récupération du Episod:", error.response?.data || error.message);
+      console.error("Erreur récupération épisode:", error.response?.data || error.message);
     } else {
-      console.error("Erreur inconnue :", error);
+      console.error("Erreur inconnue:", error);
     }
     throw error;
-  }
-};
-
-
-export const createEpisod = async (podcastId: number | string, formData: FormData) => {
-  try {
-    const token = await AsyncStorage.getItem("auth_token");
-    const response = await api.post(`/episodes/${podcastId}/add`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    // Gestion des erreurs...
   }
 };
 

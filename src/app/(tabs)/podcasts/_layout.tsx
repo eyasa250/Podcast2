@@ -9,6 +9,7 @@ const podcastLayout =()=> {
              options={{headerShown:false}}/>
             <Stack.Screen name="create" options={{ headerShown: false }} />
             <Stack.Screen name="podcastDetails" options={{ headerShown: false }} />
+            <Stack.Screen name="CreateEpisodeScreen" options={{ headerShown: false }} />
 
         </Stack>
     </View>

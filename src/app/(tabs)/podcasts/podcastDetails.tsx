@@ -9,7 +9,6 @@ export default function PodcastDetailScreen() {
   const { episodes, loading, fetchEpisodesByPodcastId } = useEpisodes();
   const router = useRouter(); // Pour naviguer vers la page de création d'épisode
 
-  console.log("id podcast", id);
 
   useEffect(() => {
     const podcastId = Array.isArray(id) ? id[0] : id;
@@ -21,7 +20,6 @@ export default function PodcastDetailScreen() {
 
 
   if (loading) return <Text>Chargement...</Text>;
-
   return (
    <TouchableOpacity
          style={{ marginBottom: 20, alignSelf: "flex-end" }}

@@ -1,4 +1,4 @@
-import { EpisodeFormData } from '@/hooks/useEpisodeForm';
+import { EpisodeFormData } from '@/types';
 import { Picker } from '@react-native-picker/picker';
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, Switch } from 'react-native';
@@ -13,12 +13,17 @@ const StepOptions = ({
   return (
     <View style={styles.container}>
       {/* Tags */}
-      <TextInput
-        value={formData.tags}
-        onChangeText={(text) => setFormData('tags', text)}
-        placeholder="ex: musique, humour, podcast"
-        style={styles.input}
-      />
+   <TextInput
+  value={formData.tags.join(', ')} // ✅ Convertit ['musique', 'humour'] → "musique, humour"
+  onChangeText={(text) => {
+    // ✅ Convertit "musique, humour" → ['musique', 'humour']
+    const tagsArray = text.split(',').map(tag => tag.trim()).filter(Boolean);
+    setFormData('tags', tagsArray);
+  }}
+  placeholder="ex: musique, humour, podcast"
+  style={styles.input}
+/>
+
       <Picker
   selectedValue={formData.audience}
   onValueChange={(value) => setFormData('audience', value)}>
@@ -32,8 +37,8 @@ const StepOptions = ({
    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
     <Text>Subtitles</Text>
     <Switch
-      value={formData.subtitlesEnabled}
-      onValueChange={(value) => setFormData('subtitlesEnabled', value)}
+      value={formData.subtitles}
+      onValueChange={(value) => setFormData('subtitles', value)}
     />
   </View>
 
@@ -41,8 +46,8 @@ const StepOptions = ({
   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
     <Text>Sound Enhancement</Text>
     <Switch
-      value={formData.soundEnhancementEnabled}
-      onValueChange={(value) => setFormData('soundEnhancementEnabled', value)}
+      value={formData.soundEnhancement}
+      onValueChange={(value) => setFormData('soundEnhancement', value)}
     />
   </View>
     </View>

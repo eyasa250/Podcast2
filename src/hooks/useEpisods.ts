@@ -1,6 +1,5 @@
-// hooks/useEpisodes.ts
 import { useState } from "react";
-import { createEpisod, getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
+import {  getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
 import { Track } from "react-native-track-player";
 
 const API_BASE_URL = "http://192.168.1.20:3001";
@@ -10,13 +9,10 @@ export const useEpisodes = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Formateur commun
   const formatData = (data: any[]): Track[] => {
     return data.map((episode: any) => ({
       id: episode.id?.toString() || Math.random().toString(),
-      url: episode.audioUrl?.startsWith("http")
-        ? episode.audioUrl
-        : `${API_BASE_URL}${episode.audioUrl}`,
+      url: episode.audioUrl?.startsWith("http") ? episode.audioUrl : `${API_BASE_URL}${episode.audioUrl}`,
       title: episode.title || "Titre inconnu",
       artist: episode.podcast?.name || "Artiste inconnu",
       artwork: episode.artwork,
@@ -51,37 +47,14 @@ export const useEpisodes = () => {
       setLoading(false);
     }
   };
-  const createEpisode = async (podcastId: number | string, formData: FormData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const newEpisode = await createEpisod(podcastId, formData);
-      setEpisodes((prev) => [...prev, {
-        id: newEpisode.id?.toString() || Math.random().toString(),
-        url: newEpisode.audioUrl?.startsWith("http")
-          ? newEpisode.audioUrl
-          : `${API_BASE_URL}${newEpisode.audioUrl}`,
-        title: newEpisode.title || "Titre inconnu",
-        artist: newEpisode.podcast?.name || "Artiste inconnu",
-        artwork: newEpisode.artwork,
-        languageTranscriptions: newEpisode.transcriptionUrls || {},
-      }]);
-      return newEpisode;
-    } catch (err: any) {
-      console.error("Erreur createEpisode:", err.message);
-      setError(err.message || "Erreur de création");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+
+ 
+
   return {
     episodes,
     loading,
     error,
     fetchAllEpisodes,
-    fetchEpisodesByPodcastId,  createEpisode, // 👈 Ajouter ceci
-
+    fetchEpisodesByPodcastId,
   };
 };

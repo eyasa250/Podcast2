@@ -3,15 +3,17 @@ import { Image } from "react-native-reanimated/lib/typescript/Animated";
 declare module '*.png'
 declare module '*.jpg'
 // types.ts ou un autre fichier d'interface
-export interface Episode {
-    id: string;
-    title: string;
-    audioUrl: string;
-    duration?: number;
-    artwork?: string;
-    podcastId?: string;
-  }
-  
+export interface EpisodeFormData  {
+  title: string;
+  description: string;
+  trackType: 'AUDIO' | 'VIDEO';
+  audience: 'GENERAL' | 'ADULT';
+  subtitles: boolean;
+  soundEnhancement: boolean;
+  tags: string[];
+  mediaFile: any;
+  imageFile?: any;
+};
 export interface Podcast {
   id: string;
   title: string;
