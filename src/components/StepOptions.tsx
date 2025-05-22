@@ -32,6 +32,12 @@ const StepOptions = ({
   <Picker.Item label="Enfants" value="KIDS" />
 </Picker>
   
+      <Picker
+  selectedValue={formData.trackType}
+  onValueChange={(value) => setFormData('trackType', value)}>
+  <Picker.Item label="AUDIO" value="AUDIO" />
+  <Picker.Item label="VIDEO" value="VIDEO" />
+</Picker>
 
    {/* Toggle Sous-titres */}
    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

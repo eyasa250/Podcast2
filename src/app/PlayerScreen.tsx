@@ -15,12 +15,8 @@ import { usePlayerBackground } from '@/hooks/usePlayerBackground';
 import { MovingText } from '@/components/MovingText';
 import { PlayerProgressBar } from '@/components/PlayerProgressbar';
 import { PlayerControls } from '@/components/PlayerControls';
-import { useLocalSearchParams } from 'expo-router';
-
 
 const PlayerScreen = () => {
-  const { videoUrl, title, artist, artwork } = useLocalSearchParams();
-
   const activeTrack = useActiveTrack();
   const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri);
   const { top, bottom } = useSafeAreaInsets();
@@ -31,7 +27,7 @@ const PlayerScreen = () => {
   const modalRef = useRef<Modalize>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<ISO639_1>('en'); // Langue par défaut
- // const videoUrl = 'http://192.168.1.20:3001/uploads/sample.mp4';
+  const videoUrl = 'http://192.168.1.20:3001/uploads/sample.mp4';
 
 // Log activeTrack details
 useEffect(() => {
@@ -39,6 +35,22 @@ useEffect(() => {
     console.log('Active Track Details:', activeTrack);
   }
 }, [activeTrack]);
+
+
+ /*  // Pour récupérer l'URL des sous-titres pour chaque vidéo
+  const getSubtitleUri = (trackUrl: string) => {
+    // Ici, tu associes un fichier .vtt à chaque URL de track
+    if (trackUrl.includes("track1.mp4")) {
+      return 'http://localhost:8081/subtitles/track1.vtt';
+    } else if (trackUrl.includes("track2.mp4")) {
+      return 'http://localhost:8081/subtitles/track2.vtt';
+    }
+    // Si aucun fichier n'est trouvé, renvoie une URL vide ou nulle
+    return null;
+  };
+
+  const subtitleUri = activeTrack ? getSubtitleUri(activeTrack.url) : null;
+ */
   if (!activeTrack) {
     return (
      <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
@@ -46,7 +58,28 @@ useEffect(() => {
       </View>
     );
   }
+ /*  const subtitleTracks = activeTrack.languageTranscriptions
+  ? Object.keys(activeTrack.languageTranscriptions).map((lang) => {
+      const isoLang = lang as ISO639_1;
+      return {
+        title: isoLang,
+        language: isoLang,
+        type: TextTrackType.VTT,
+        uri: activeTrack.languageTranscriptions[lang],
+      };
+    })
+  : [];
 
+   // Fonction pour ouvrir/fermer le modal
+   const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  // Fonction pour sélectionner une langue
+  const handleLanguageSelect = (language: ISO639_1) => {
+    setSelectedLanguage(language);
+    setIsModalVisible(false); // Ferme le modal après sélection
+  }; */
   return (
     <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
@@ -75,7 +108,33 @@ useEffect(() => {
             onLoad={() => setIsPlaying(true)}
             onEnd={() => setIsPlaying(false)}
             onProgress={({ currentTime: time }) => setCurrentTime(time)}
-   
+            /*  textTracks={
+              subtitleUri
+                ? [
+                    {
+                      title: 'Français',
+                      language: 'fr',
+                      type: TextTrackType.VTT,
+                      uri: subtitleUri,
+                    },
+                    {
+                      title: 'Anglais',
+                      language: 'en',
+                      type: TextTrackType.VTT,
+                      uri: subtitleUri,
+                    },
+                  ]
+                : []
+            }
+            selectedTextTrack={{
+              type: SelectedTrackType.LANGUAGE,
+              value: 'fr',
+            }} */
+           /*    textTracks={subtitleTracks}
+              selectedTextTrack={{
+                type: SelectedTrackType.LANGUAGE,
+                value: selectedLanguage,  // La langue sélectionnée
+              }} */
   textTracks={[
     {
       title: 'Français',

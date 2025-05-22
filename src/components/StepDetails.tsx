@@ -16,23 +16,7 @@ const StepDetails = ({ formData, setFormData }: StepDetailsProps) => {
 
   const { mediaFile, title, description, imageFile } = formData;
 
-  /* const pickimageFile = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (!permissionResult.granted) {
-      Alert.alert('Permission refusée', 'L’accès à la galerie est requis.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets && result.assets[0]) {
-      setFormData('imageFile', { uri: result.assets[0].uri });
-    }
-  }; */
 const pickImageFile = async () => {
   const result = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
   if (!result.canceled && result.assets.length > 0) {

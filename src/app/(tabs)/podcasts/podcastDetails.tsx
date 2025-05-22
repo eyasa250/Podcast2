@@ -2,36 +2,39 @@ import { EpisodeList } from "@/components/EpisodeList";
 import { useEpisodes } from "@/hooks/useEpisods";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { View, Text, Button, TouchableOpacity ,StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function PodcastDetailScreen() {
   const { id } = useLocalSearchParams(); // ID du podcast
-  const { episodes, loading, fetchEpisodesByPodcastId } = useEpisodes();
-  const router = useRouter(); // Pour naviguer vers la page de création d'épisode
+    const Id = Array.isArray(id) ? id[0] : id; // ✅ Force en string
 
+  const { episodes, loading, error } = useEpisodes({ podcastId: Id }); // <-- utilise useEpisodes
+  const router = useRouter();
 
   useEffect(() => {
-    const podcastId = Array.isArray(id) ? id[0] : id;
-
-    if (podcastId) {
-      fetchEpisodesByPodcastId(podcastId); // Utilise l'ID pour récupérer les épisodes du podcast
+    console.log("📡 Podcast ID:", Id);
+    console.log("🎧 Episodes:", episodes);
+    if (error) {
+      console.error("❌ Erreur dans useEpisodes:", error);
     }
-  }, [id]);
+  }, [episodes, error]);
 
-
-  if (loading) return <Text>Chargement...</Text>;
   return (
-   <TouchableOpacity
-         style={{ marginBottom: 20, alignSelf: "flex-end" }}
-         onPress={() => router.push(`/(tabs)/podcasts/stepper?id=${id}`)}
-         >
-         <Text style={styles.link}>+ New Episode</Text>
-       </TouchableOpacity>
- 
+    <View style={{ flex: 1, padding: 16 }}>
+      <TouchableOpacity
+        style={{ marginBottom: 20, alignSelf: "flex-end" }}
+        onPress={() => router.push(`/(tabs)/podcasts/stepper?id=${id}`)}
+      >
+        <Text style={styles.link}>+ New Episode</Text>
+      </TouchableOpacity>
+
+      {/* Affiche les épisodes */}
+<EpisodeList data={episodes} />
+    </View>
   );
 }
-const styles = StyleSheet.create({
 
+const styles = StyleSheet.create({
   link: {
     color: "#007AFF",
     fontWeight: "bold",

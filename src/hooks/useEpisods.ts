@@ -1,60 +1,79 @@
-import { useState } from "react";
-import {  getAllEpisods, getEpisodesByPodcastId } from "@/services/episodeApi";
-import { Track } from "react-native-track-player";
+import { useEffect, useState } from "react";
+import {
+  getAllEpisods,
+  getEpisodesByPodcastId,
+} from "@/services/episodeApi";
+import { Episode } from "@/types";
 
-const API_BASE_URL = "http://192.168.1.20:3001";
+type UseEpisodesOptions = {
+  podcastId?: string | number;
+};
 
-export const useEpisodes = () => {
-  const [episodes, setEpisodes] = useState<Track[]>([]);
-  const [loading, setLoading] = useState(false);
+// ✅ Fonction de transformation des données
+const formatEpisodesData = (data: any[]): Episode[] => {
+  return data.map((ep) => ({
+    id: ep.id?.toString(),
+    title: ep.title || "Untitled",
+    description: ep.description || "No description",
+    trackType: ep.trackType || "AUDIO",
+    audience: ep.audience || "GENERAL",
+    tags: ep.tags ? JSON.parse(ep.tags) : [],
+    createdAt: ep.createdAt,
+    audioUrl: ep.audioUrl || null,
+    videoUrl: ep.videoUrl || null,
+    coverImageUrl: ep.coverImageUrl || "",
+    subtitles: ep.subtitles,
+    transcriptionUrls: ep.transcriptionUrls || {},
+    soundEnhancement: ep.soundEnhancement,
+    soundEnhancementUrl: ep.soundEnhancementUrl || null,
+    podcastId: ep.podcastId,
+    podcast: {
+      id: ep.podcast?.id,
+      title: ep.podcast?.title || "Unknown Podcast",
+      description: ep.podcast?.description || "",
+      createdAt: ep.podcast?.createdAt,
+      userId: ep.podcast?.userId,
+      category: ep.podcast?.category || "UNKNOWN",
+    },
+  }));
+};
+
+
+export const useEpisodes = (options: UseEpisodesOptions = {}) => {
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const formatData = (data: any[]): Track[] => {
-    return data.map((episode: any) => ({
-      id: episode.id?.toString() || Math.random().toString(),
-      url: episode.audioUrl?.startsWith("http") ? episode.audioUrl : `${API_BASE_URL}${episode.audioUrl}`,
-      title: episode.title || "Titre inconnu",
-      artist: episode.podcast?.name || "Artiste inconnu",
-      artwork: episode.artwork,
-      languageTranscriptions: episode.transcriptionUrls || {},
-    }));
-  };
-
-  const fetchAllEpisodes = async () => {
+  const fetchEpisodes = async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const data = await getAllEpisods();
-      setEpisodes(formatData(data));
+      let data;
+      if (options.podcastId) {
+        data = await getEpisodesByPodcastId(options.podcastId);
+      } else {
+        data = await getAllEpisods();
+      }
+
+      // ✅ Appliquer le formatage ici
+      setEpisodes(formatEpisodesData(data));
     } catch (err: any) {
-      console.error("Erreur fetchAllEpisodes:", err.message);
-      setError(err.message || "Erreur de récupération");
+      setError(err.message || "Erreur lors de la récupération des épisodes");
+      console.error("Erreur API:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchEpisodesByPodcastId = async (podcastId: number | string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getEpisodesByPodcastId(podcastId);
-      setEpisodes(formatData(data));
-    } catch (err: any) {
-      console.error("Erreur fetchEpisodesByPodcastId:", err.message);
-      setError(err.message || "Erreur de récupération");
-    } finally {
-      setLoading(false);
-    }
-  };
-
- 
+  useEffect(() => {
+    fetchEpisodes();
+  }, [options.podcastId]);
 
   return {
     episodes,
     loading,
     error,
-    fetchAllEpisodes,
-    fetchEpisodesByPodcastId,
+    refetch: fetchEpisodes,
   };
 };

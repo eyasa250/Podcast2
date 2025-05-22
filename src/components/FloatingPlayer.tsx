@@ -47,7 +47,6 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 				<SkipToNextButton iconSize={22} />
 			</View>
 
-			{/* Bouton de fermeture */}
 			<CloseButton iconSize={30} onPress={hidePlayer} />
 
 	

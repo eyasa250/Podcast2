@@ -1,7 +1,7 @@
 import { Video, ResizeMode } from 'expo-av';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { EpisodeFormData } from '@/types';
 interface StepUploadProps {
@@ -13,29 +13,21 @@ export default function StepUpload({ formData, setMediaFile }: StepUploadProps) 
   const [videoName, setVideoName] = useState(formData.mediaFile?.name || '');
   const [loading, setLoading] = useState(false);
 
- /*  const pickVideo = async () => {
-    setLoading(true);
-    const result = await DocumentPicker.getDocumentAsync({
-      type: 'video/*',
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      const name = result.assets[0].name;
-
-      setVideoUri(uri);
-      setVideoName(name);
-
-      updateVideoData({ uri, name }); // ✅ Met à jour via le hook useEpisodeForm
-    }
-    setLoading(false);
-  }; */
   const pickMediaFile = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: 'video/*' });
     if (!result.canceled && result.assets.length > 0) {
       setMediaFile(result.assets[0]);
     }
   };
+
+  // 🔁 Met à jour l’aperçu si le mediaFile change
+  useEffect(() => {
+    if (formData.mediaFile?.uri) {
+      setVideoUri(formData.mediaFile.uri);
+      setVideoName(formData.mediaFile.name);
+    }
+  }, [formData.mediaFile]);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.dropZone} onPress={pickMediaFile} disabled={loading}>

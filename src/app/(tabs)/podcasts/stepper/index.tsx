@@ -24,19 +24,7 @@ const { formData, updateField} = useEpisodeForm();
     marginTop: 10,
   };
 
-const pickMediaFile = async () => {
-  const result = await DocumentPicker.getDocumentAsync({ type: 'video/*' });
-  if (!result.canceled && result.assets.length > 0) {
-    updateField('mediaFile', result.assets[0]);
-  }
-};
 
-const pickImageFile = async () => {
-  const result = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
-  if (!result.canceled && result.assets.length > 0) {
-    updateField('imageFile', result.assets[0]);
-  }
-};
 
   useEffect(() => {
     if (!Id) {
@@ -61,23 +49,28 @@ const buildFormDataFromEpisode = (episodeData: EpisodeFormData): FormData => {
     .filter(tag => tag.length > 0)
     .forEach(tag => formData.append('tags[]', tag));
 
-  if (!episodeData.mediaFile) {
-    throw new Error("Aucun fichier média sélectionné.");
-  }
+if (!episodeData.mediaFile) {
+  throw new Error("Aucun fichier média sélectionné.");
+}
 
-  formData.append('files', {
-    uri: episodeData.mediaFile.uri,
-    name: episodeData.mediaFile.name,
-    type: episodeData.mediaFile.mimeType || (episodeData.trackType === 'AUDIO' ? 'audio/mpeg' : 'video/mp4'),
+// ✅ Utilise le bon champ selon le type de fichier
+const mediaFieldName = episodeData.trackType === 'AUDIO' ? 'audio' : 'video';
+console.log(mediaFieldName)
+formData.append(mediaFieldName, {
+  uri: episodeData.mediaFile.uri,
+  name: episodeData.mediaFile.name,
+  type: episodeData.mediaFile.mimeType || (episodeData.trackType === 'AUDIO' ? 'audio/mpeg' : 'video/mp4'),
+} as any);
+
+
+if (episodeData.imageFile) {
+  formData.append('cover', {
+    uri: episodeData.imageFile.uri,
+    name: episodeData.imageFile.name,
+    type: episodeData.imageFile.mimeType || 'image/jpeg',
   } as any);
+}
 
-  if (episodeData.imageFile) {
-    formData.append('files', {
-      uri: episodeData.imageFile.uri,
-      name: episodeData.imageFile.name,
-      type: episodeData.imageFile.mimeType || 'image/jpeg',
-    } as any);
-  }
 
   return formData;
 };

@@ -1,47 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { Stack } from "expo-router";
-import { useAuth } from "@/hooks/useAuth"; // Importer ton hook useAuth
+import { useAuth } from "@/hooks/useAuth"; // Ton hook personnalisé
 
 export default function AccountLayout() {
-  const { user, loading, fetchUserInfo } = useAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading } = useAuth();
+  const [currentScreen, setCurrentScreen] = useState("auth");
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      // Vérifie si les infos utilisateur sont disponibles et authentifiées
-      if (user) {
-        setIsAuthenticated(true); // L'utilisateur est authentifié
+    console.log("User:", user);
+
+    if (user) {
+      if (user.role === "PODCASTER") {
+        setCurrentScreen("ChatIntroScreen");
+          console.log(currentScreen)     
+         } else if (user.role === "AUDITOR") {
+        setCurrentScreen("premium");
       } else {
-        setIsAuthenticated(false); // L'utilisateur n'est pas authentifié
+        setCurrentScreen("premium"); 
       }
-    };
-    
-    checkAuthStatus();
-  }, [user]); // Mettre à jour l'état chaque fois que `user` change
+    } else {
+      setCurrentScreen("auth");
+    }
+  }, [user]);
 
   if (loading) {
-    return <Text>Loading...</Text>; // Afficher un loader pendant la récupération des données utilisateur
+    return <Text>Loading...</Text>;
   }
 
   return (
     <View style={{ flex: 1 }}>
       <Stack>
-        {/* Si l'utilisateur n'est pas authentifié, afficher la page d'authentification */}
-        {!isAuthenticated ? (
-          <Stack.Screen
-            name="auth"
-            options={{ headerShown: false }} // Pas d'en-tête pour la page auth
-          />
-        ) : (
-          // Si l'utilisateur est authentifié, afficher la page premium
-          <Stack.Screen
-            name="premium"
-            options={{ headerShown: false }} // Pas d'en-tête pour la page premium
-          />
-          
-          
-        )}
+        <Stack.Screen name={currentScreen} options={{ headerShown: false }} />
       </Stack>
     </View>
   );

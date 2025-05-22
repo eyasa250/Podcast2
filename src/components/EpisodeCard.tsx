@@ -1,20 +1,27 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { Track } from "react-native-track-player";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Ionicons, Entypo } from "@expo/vector-icons";
+import { Episode } from "@/types";
 
 type Props = {
-  episode: Track; // Ici, on s'assure que 'episode' est bien un 'Track'
+  episode: Episode;
   onPress: () => void;
 };
 
 export const EpisodeCard = ({ episode, onPress }: Props) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
+      <Image source={{ uri: episode.imageUrl }} style={styles.image} />
+
       <View style={styles.content}>
-        <Text style={styles.title}>{episode.title}</Text>
-        {/* D'autres informations du track peuvent être affichées ici si nécessaire */}
+        <Text style={styles.date}>4 days ago</Text>
+        <Text style={styles.title} numberOfLines={1}>{episode.title}</Text>
+        <Text style={styles.artist}>{episode.tags}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color="gray" />
+
+      <View style={styles.actions}>
+        <Ionicons name="heart-outline" size={20} color="#555" style={styles.icon} />
+        <Entypo name="dots-three-vertical" size={16} color="#555" />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -22,8 +29,8 @@ export const EpisodeCard = ({ episode, onPress }: Props) => {
 const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 16,
     padding: 12,
     marginBottom: 12,
     alignItems: "center",
@@ -33,13 +40,37 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
+  image: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: "#ddd",
+  },
   content: {
     flex: 1,
     marginLeft: 12,
   },
+  date: {
+    fontSize: 12,
+    color: "#888",
+    marginBottom: 4,
+  },
   title: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    color: "#222",
+  },
+  artist: {
+    fontSize: 14,
+    color: "#666",
+  },
+  actions: {
+    marginLeft: 12,
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 64,
+  },
+  icon: {
+    marginBottom: 8,
   },
 });

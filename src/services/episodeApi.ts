@@ -1,4 +1,5 @@
 import axios from "axios";
+import { List } from "react-native-paper";
 
 const API_BASE_URL = "http://192.168.1.20:3001";
 
@@ -67,6 +68,8 @@ export const uploadEpisode = async (podcastId: string, formData: FormData) => {
 export const getAllEpisods = async () => {
   try {
     const response = await api.get("/episodes");
+        console.log("liste des episodes:",response.data);
+
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -81,6 +84,8 @@ export const getAllEpisods = async () => {
 export const getEpisodById = async (id: number) => {
   try {
     const response = await api.get(`/episodes/${id}`);
+            console.log("liste des episodes:",response.data);
+
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
