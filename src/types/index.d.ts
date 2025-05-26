@@ -50,6 +50,8 @@ export interface Podcast {
   category: string
   author: string;
   image: Image;
+  userId: number,
+
 }
 
   

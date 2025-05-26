@@ -17,17 +17,37 @@ export const EpisodeList = ({ data }: { data: Episode[] }) => {
     await TrackPlayer.play(); // Joue le tracka
     router.push('/player'); // Redirige vers PlayerScreen
   }; */
-  const handleTrackSelect = async (episode: Episode) => {
-  router.push({
-    pathname: '/player',
-    params: {
-      videoUrl: episode.videoUrl,
+const handleTrackSelect = async (episode: Episode) => {
+  if (episode.trackType === 'AUDIO') {
+    const track: Track = {
+      id: episode.id.toString(),
       title: episode.title,
+      url: episode.audioUrl!,
       artist: episode.podcast.title,
       artwork: episode.coverImageUrl,
-    },
-  });
+    };
+
+    await TrackPlayer.load(track);
+    await TrackPlayer.play();
+
+    router.push('/player'); // audio player
+  } else {
+    router.push({
+      pathname: '/player',
+      params: {
+        title: episode.title,
+        artist: episode.podcast.title,
+        artwork: episode.coverImageUrl,
+        videoUrl: episode.videoUrl!,
+        trackType: episode.trackType,
+        transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
+      },
+    });
+  }
 };
+
+
+
 
 const episodeToTrack = (episode: Episode): Track => ({
   id: episode.id,
@@ -50,7 +70,7 @@ const episodeToTrack = (episode: Episode): Track => ({
         </View>
       }
  renderItem={({ item: episode }) => {
-      console.log("🎯 episode envoyé au player:", JSON.stringify(episode, null, 2));
+    //  console.log("🎯 episode envoyé au player:", JSON.stringify(episode, null, 2));
 
   const track = episodeToTrack(episode);
   return (

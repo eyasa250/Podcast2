@@ -1,35 +1,49 @@
-// VideoPlayer.tsx
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import Video from "react-native-video";
+import { View, StyleSheet } from 'react-native';
+import { Video, TextTrackType, SelectedTrackType } from 'react-native-video';
 
-type VideoPlayerProps = {
-  source: string;
-};
+interface Props {
+  url: string;
+  subtitleUrl?: string;
+}
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
+export const VideoPlayer = ({ url, subtitleUrl }: Props) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.videoContainer}>
       <Video
-        source={{ uri: source }}
+        source={{ uri: url }}
         style={styles.video}
         controls
         resizeMode="contain"
+        textTracks={
+          subtitleUrl
+            ? [
+                {
+                  title: 'Français',
+                  language: 'fr',
+                  type: TextTrackType.VTT,
+                  uri: subtitleUrl,
+                },
+              ]
+            : []
+        }
+        selectedTextTrack={{
+          type: SelectedTrackType.LANGUAGE,
+          value: 'fr',
+        }}
+        onError={(e) => console.error('Video error:', e)}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  videoContainer: {
+    width: '100%',
+    height: 250,
+    backgroundColor: 'black',
   },
   video: {
-    width: "100%",
-    height: 300,
+    width: '100%',
+    height: '100%',
   },
 });
-
-export default VideoPlayer;

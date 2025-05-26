@@ -9,7 +9,6 @@ import StepOptions from '@/components/StepOptions';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { uploadEpisode } from '@/services/episodeApi';
 import { useEpisodeForm } from '@/hooks/useEpisodeForm';
-import * as DocumentPicker from 'expo-document-picker';
 import { EpisodeFormData } from '@/types';
 
 const StepperScreen = () => {
@@ -122,7 +121,7 @@ onSubmit={async () => {
   const response = await uploadEpisode(Id, builtFormData);
   console.log('Réponse du serveur:', response);
 
-    router.replace('/home');
+    router.replace('/(tabs)/podcasts/podcastDetails');
   } catch (error) {
   console.error('Erreur upload:', error);
   }

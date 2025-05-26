@@ -1,47 +1,54 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity,Image } from 'react-native';
-import { useActiveTrack } from 'react-native-track-player';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '@/core/theme';
-import { Video, TextTrackType, SelectedTrackType, ISO639_1 } from 'react-native-video';
 import { FontAwesome6 } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { Modalize } from 'react-native-modalize';
 import { TrackOptionsModal } from '@/components/TrackOptionsModal';
 import { defaultStyles } from '@/styles';
-import { unknownTrackImageUri } from '@/constants/images';
-import { usePlayerBackground } from '@/hooks/usePlayerBackground';
-import { MovingText } from '@/components/MovingText';
-import { PlayerProgressBar } from '@/components/PlayerProgressbar';
-import { PlayerControls } from '@/components/PlayerControls';
-import { useLocalSearchParams } from 'expo-router';
+import { colors } from '@/core/theme';
+import { AudioPlayer } from '@/components/AudioPlayer';
+import { VideoPlayer } from '@/components/VideoPlayer';
+import { useActiveTrack } from 'react-native-track-player';
+import { TextTrackType } from 'react-native-video'; // 👈 requis pour les sous-titres
 
+const isVideoUrl = (url: string) =>
+  url?.endsWith('.mp4') || url?.includes('video') || url?.includes('.m3u8'); // simple heuristique
 
 const PlayerScreen = () => {
-  const { videoUrl, title, artist, artwork } = useLocalSearchParams();
-
-  const activeTrack = useActiveTrack();
-  const { imageColors } = usePlayerBackground(activeTrack?.artwork ?? unknownTrackImageUri);
   const { top, bottom } = useSafeAreaInsets();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeSubtitle, setActiveSubtitle] = useState(null);
   const modalRef = useRef<Modalize>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<ISO639_1>('en'); // Langue par défaut
- // const videoUrl = 'http://192.168.1.20:3001/uploads/sample.mp4';
+  const activeTrack = useActiveTrack();
 
-// Log activeTrack details
-useEffect(() => {
-  if (activeTrack) {
-    console.log('Active Track Details:', activeTrack);
-  }
-}, [activeTrack]);
-  if (!activeTrack) {
+  const {
+    trackType,
+    videoUrl,
+    transcriptionUrls,
+  } = useLocalSearchParams<{
+    trackType: 'AUDIO' | 'VIDEO';
+    videoUrl?: string;
+    transcriptionUrls?: string;
+  }>();
+
+  const subtitles = transcriptionUrls
+    ? Object.entries(JSON.parse(transcriptionUrls)).map(([lang, uri]) => ({
+        title: lang.toUpperCase(),
+        language: lang,
+        type: TextTrackType.VTT,
+        uri,
+      }))
+    : [];
+
+  const videoSourceUrl = videoUrl;
+  const audioSourceUrl = activeTrack?.url;
+
+  const showVideo = trackType === 'VIDEO' && videoSourceUrl;
+  const showAudio = trackType === 'AUDIO' && activeTrack;
+
+  if (trackType === 'AUDIO' && !activeTrack) {
     return (
-     <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
+      <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
         <ActivityIndicator color={colors.icon} />
       </View>
     );
@@ -50,6 +57,7 @@ useEffect(() => {
   return (
     <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
+        {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()}>
             <FontAwesome6 name="arrow-left" size={25} color="white" />
@@ -62,62 +70,24 @@ useEffect(() => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ position: 'relative' }}>
-          {/* Video Player */}
-          <Video
-            source={{ uri: activeTrack.url }}
-              onError={(e) => {
-    console.log('Erreur vidéo:', e);
-  }}
-            style={styles.video}
-            controls={true}
-            resizeMode="contain"
-            onLoad={() => setIsPlaying(true)}
-            onEnd={() => setIsPlaying(false)}
-            onProgress={({ currentTime: time }) => setCurrentTime(time)}
-   
-  textTracks={[
-    {
-      title: 'Français',
-      language: 'fr',
-      type: TextTrackType.VTT,
-      uri: 'http://localhost:8081/sample.vtt',
-    },
-    {
-      title: 'Anglais',
-      language: 'en',
-      type: TextTrackType.VTT,
-      uri: 'http://localhost:8081/sample.vtt',
-    },
-  ]}
-  selectedTextTrack={{
-    type: SelectedTrackType.LANGUAGE,
-    value: 'fr',
-  }} 
+        {/* Player */}
+        {showVideo ? (
+          <VideoPlayer url={videoSourceUrl!} />
+        ) : (
+          <AudioPlayer />
+        )}
 
+        {/* Options */}
+        {activeTrack && (
+          <TrackOptionsModal
+            ref={modalRef}
+            trackTitle={activeTrack.title}
+            artist={activeTrack.artist}
+            onLike={() => console.log('💖 Liked track')}
+            onAddTopodcast={() => console.log('➕ Added to podcast')}
           />
-        </View>
-
-        {/* Track Infos */}
-        <View style={styles.bottomSection}>
-          <View style={styles.trackInfoContainer}>
-            <Text style={styles.trackTitleText}>{activeTrack.title}</Text>
-            {activeTrack.artist && (
-              <Text numberOfLines={1} style={styles.trackArtistText}>
-                {activeTrack.artist}
-              </Text>
-            )}
-          </View>
-        </View>
+        )}
       </View>
-
-      <TrackOptionsModal
-        ref={modalRef}
-        trackTitle={activeTrack.title}
-        artist={activeTrack.artist}
-        onLike={() => console.log('💖 Liked track')}
-        onAddTopodcast={() => console.log('➕ Added to podcast')}
-      />
     </LinearGradient>
   );
 };
@@ -138,33 +108,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginHorizontal: 16,
   },
-  video: {
-    width: '100%',
-    height: 250,
-    backgroundColor: 'black',
-  },
-  bottomSection: {
-    flexShrink: 1,
-    justifyContent: 'flex-start',
-  },
-  trackInfoContainer: {
-    alignItems: 'baseline',
-    marginBottom: 12,
-  },
-  trackTitleText: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  trackArtistText: {
-    fontSize: 16,
-    color: 'lightgray',
-    textAlign: 'center',
-    marginTop: 4,
-  },
 });
 
 export default PlayerScreen;
-
-

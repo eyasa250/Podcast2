@@ -16,6 +16,7 @@ const formatPodcastsData = (data: any[]): Podcast[] =>
     category: podcast.category || "No category",
     image:podcast.image,
     author: podcast.user?.name || "Unknown author",
+    userId:podcast.userId
   }));
 
 export const usePodcasts = (options: UsePodcastsOptions = {}) => {

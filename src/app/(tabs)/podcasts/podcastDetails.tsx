@@ -1,5 +1,7 @@
 import { EpisodeList } from "@/components/EpisodeList";
+import { useAuth } from "@/hooks/useAuth";
 import { useEpisodes } from "@/hooks/useEpisods";
+import { usePodcastDetails } from "@/hooks/usePodcastDetails";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
@@ -7,8 +9,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 export default function PodcastDetailScreen() {
   const { id } = useLocalSearchParams(); // ID du podcast
     const Id = Array.isArray(id) ? id[0] : id; // ✅ Force en string
+const { user } = useAuth(); // suppose que `user.id` existe
+  const { podcast } = usePodcastDetails(id as string);
 
   const { episodes, loading, error } = useEpisodes({ podcastId: Id }); // <-- utilise useEpisodes
+  
   const router = useRouter();
 
   useEffect(() => {
