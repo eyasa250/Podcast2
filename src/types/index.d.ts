@@ -40,8 +40,7 @@ interface Episode {
     userId: number;
     category: string;
   };
-}
-
+} 
 
 export interface Podcast {
   id: string;

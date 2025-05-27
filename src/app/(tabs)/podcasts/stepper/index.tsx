@@ -47,14 +47,14 @@ const buildFormDataFromEpisode = (episodeData: EpisodeFormData): FormData => {
     .map(tag => tag.trim())
     .filter(tag => tag.length > 0)
     .forEach(tag => formData.append('tags[]', tag));
-
+console.log("episode media file", episodeData.mediaFile);
 if (!episodeData.mediaFile) {
   throw new Error("Aucun fichier média sélectionné.");
 }
 
 // ✅ Utilise le bon champ selon le type de fichier
 const mediaFieldName = episodeData.trackType === 'AUDIO' ? 'audio' : 'video';
-console.log(mediaFieldName)
+console.log("media file name:",mediaFieldName)
 formData.append(mediaFieldName, {
   uri: episodeData.mediaFile.uri,
   name: episodeData.mediaFile.name,
@@ -70,6 +70,20 @@ if (episodeData.imageFile) {
   } as any);
 }
 
+  // 🔍 LOG FormData entries ici
+// Ce n'est pas automatique : on log manuellement ce qu'on a mis dans formData
+console.log('🧪 FormData debug:');
+console.log('video:', {
+  uri: episodeData.mediaFile.uri,
+  name: 'video.mp4',
+  type: 'video/mp4',
+});
+console.log('title:',episodeData.title);
+console.log('description:',episodeData.description);
+console.log('trackType:', episodeData.trackType);
+console.log('audience:', episodeData.audience);
+console.log('subtitles:', episodeData.subtitles);
+console.log('soundEnhancement:', episodeData.soundEnhancement);
 
   return formData;
 };
@@ -115,8 +129,8 @@ onSubmit={async () => {
     console.log('🎯 FormData Final:', formData);
 
     const builtFormData = buildFormDataFromEpisode(formData);
+    
     console.log("builtformatdata: ",builtFormData) // ✅ Conversion ici
-
 
   const response = await uploadEpisode(Id, builtFormData);
   console.log('Réponse du serveur:', response);

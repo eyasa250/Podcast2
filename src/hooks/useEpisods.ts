@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  getAllEpisods,
+  
   getEpisodesByPodcastId,
 } from "@/services/episodeApi";
 import { Episode } from "@/types";
@@ -53,8 +53,7 @@ export const useEpisodes = (options: UseEpisodesOptions = {}) => {
       if (options.podcastId) {
         data = await getEpisodesByPodcastId(options.podcastId);
       } else {
-        data = await getAllEpisods();
-      }
+console.log("no podcast id ")      }
 
       // ✅ Appliquer le formatage ici
       setEpisodes(formatEpisodesData(data));

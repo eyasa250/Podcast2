@@ -56,6 +56,7 @@ const api = axios.create({
   return data;
 }; */
 export const uploadEpisode = async (podcastId: string, formData: FormData) => {
+  
   const response = await fetch(`http://192.168.1.20:3001/episodes/${podcastId}/add`, {
     method: 'POST',
     body: formData,
@@ -65,7 +66,7 @@ export const uploadEpisode = async (podcastId: string, formData: FormData) => {
   return data;
 };
 
-export const getAllEpisods = async () => {
+/* export const getAllEpisods = async () => {
   try {
     const response = await api.get("/episodes");
         console.log("liste des episodes:",response.data);
@@ -79,7 +80,7 @@ export const getAllEpisods = async () => {
     }
     throw error;
   }
-};
+}; */
 
 export const getEpisodById = async (id: number) => {
   try {

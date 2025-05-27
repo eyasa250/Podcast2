@@ -3,7 +3,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { EpisodeFormData } from '@/types';
-import Video, { ResizeMode } from 'react-native-video';
+import { ResizeMode, Video } from 'expo-av';
 interface StepUploadProps {
   formData: EpisodeFormData;
   setMediaFile: (data: { uri: string; name: string }) => void;
@@ -44,7 +44,7 @@ export default function StepUpload({ formData, setMediaFile }: StepUploadProps) 
         <Video
           source={{ uri: videoUri }}
           resizeMode={ResizeMode.CONTAIN}
-          //useNativeControls
+          useNativeControls
           style={styles.video}
         />
       )}
