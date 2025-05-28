@@ -33,14 +33,7 @@ const ProfileScreen = () => {
       {/* Section des abonnements ou podcasts selon le rôle */}
       {user.role === 'PODCASTER' ? (
         <>
-          {/* Mes Podcasts */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Mes Podcasts</Text>
-            <TouchableOpacity style={styles.button} onPress={() =>  router.push("/podcasts/videoUploader")}>
-            <Ionicons name="add-circle-outline" size={24} color="white" />
-              <Text style={styles.buttonText}>Ajouter un épisode</Text>
-            </TouchableOpacity>
-          </View>
+  
 
           {/* Statistiques */}
           <View style={styles.section}>
@@ -59,6 +52,13 @@ const ProfileScreen = () => {
           </View>
         </>
       )}
+<TouchableOpacity
+  style={[styles.button, { backgroundColor: '#2196F3', marginBottom: 20 }]}
+  onPress={() => router.push('/profile/settingScreen')}
+>
+  <Ionicons name="settings-outline" size={24} color="white" />
+  <Text style={styles.buttonText}>Paramètres</Text>
+</TouchableOpacity>
 
       {/* Section Déconnexion */}
       <View style={styles.logoutSection}>

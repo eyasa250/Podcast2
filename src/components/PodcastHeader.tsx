@@ -1,61 +1,58 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+import { View, Text, ImageBackground, StyleSheet } from "react-native";
+import { colors } from "@/core/theme";
 
-interface PodcastHeaderProps {
-  title: string;
-  author: string;
-  duration: string;
-  image: string;
+export function PodcastHeader({ coverImage, title, description, author, subscriberCount }: any) {
+  return (
+    <ImageBackground
+      source={{ uri: coverImage || "https://via.placeholder.com/500" }}
+      style={styles.header}
+      blurRadius={20}
+    >
+      <View style={styles.headerContent}>
+        <Text style={styles.playlistType}>playlist</Text>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{description}</Text>
+        <Text style={styles.madeFor}>{author}</Text>
+        <Text style={{ color: "#000", fontSize: 14, marginTop: 4 }}>
+          {subscriberCount !== null ? `${subscriberCount} abonnés` : "Chargement..."}
+        </Text>
+      </View>
+    </ImageBackground>
+  );
 }
 
-export const PodcastHeader: React.FC<PodcastHeaderProps> = ({ title, author, duration, image }) => {
-  return (
-    <View style={styles.container}>
-      <Image source={{ uri: image }} style={styles.image} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.author}>by {author}</Text>
-      <Text style={styles.duration}>{duration}</Text>
-
-      <TouchableOpacity style={styles.playButton}>
-        <Text style={styles.playText}>▶️ Play</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
-  container: {
+  header: {
+    height: 300,
+    justifyContent: "flex-end",
+    paddingHorizontal: 20,
+    paddingBottom: 30,
     alignItems: "center",
-    marginBottom: 20,
   },
-  image: {
-    width: 180,
-    height: 180,
-    borderRadius: 12,
-    marginBottom: 12,
+  headerContent: {
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  playlistType: {
+    color: "#555",
+    fontSize: 14,
+    textTransform: "uppercase",
+    fontWeight: "600",
+    marginBottom: 8,
   },
   title: {
-    fontSize: 22,
+    color: "#000",
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    marginBottom: 4,
   },
-  author: {
+  subtitle: {
+    color: "#666",
     fontSize: 16,
-    color: "#ccc",
   },
-  duration: {
-    fontSize: 14,
-    color: "#999",
-    marginBottom: 10,
-  },
-  playButton: {
-    backgroundColor: "#1DB954",
-    paddingVertical: 8,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-    marginTop: 10,
-  },
-  playText: {
-    color: "#fff",
-    fontWeight: "bold",
+  madeFor: {
+    color: colors.primary,
+    fontSize: 12,
   },
 });
