@@ -15,7 +15,10 @@ export default function PodcastDetailScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { podcast } = usePodcastDetails(Id);
-  const { episodes } = useEpisodes({ podcastId: Id });
+  const { episodes } = useEpisodes({
+    podcastId: Id,
+    favorites: false
+  });
 
   const { count, isSubscribed, subscribe, unsubscribe, loading } = useSubscriberCount(Number(Id));
   const handleSubscribePress = () => {

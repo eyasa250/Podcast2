@@ -30,14 +30,15 @@ export const PlayPauseButton = ({ style, iconSize = 48 }: PlayerButtonProps) => 
 	const { playing } = useIsPlaying()
 
 	return (
-		<View style={[{ height: iconSize }, style]}>
-			<TouchableOpacity
-				activeOpacity={0.85}
-				onPress={playing ? TrackPlayer.pause : TrackPlayer.play}
-			>
-				<FontAwesome6 name={playing ? 'pause' : 'play'} size={iconSize} color={colors.text} />
-			</TouchableOpacity>
-		</View>
+	<View style={[{ height: iconSize }, style]}>
+	<TouchableOpacity
+		activeOpacity={0.85}
+		onPress={playing ? TrackPlayer.pause : TrackPlayer.play}
+	>
+		<FontAwesome6 name={playing ? 'pause' : 'play'} size={iconSize} color={colors.text} />
+	</TouchableOpacity>
+</View>
+
 	)
 }
 

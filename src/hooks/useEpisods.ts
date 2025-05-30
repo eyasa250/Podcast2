@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-  
   getEpisodesByPodcastId,
+  
 } from "@/services/episodeApi";
 import { Episode } from "@/types";
+import { getUserFavorites } from "@/services/favoritesApi";
 
 type UseEpisodesOptions = {
   podcastId?: string | number;
+  favorites: boolean;
 };
 
-// ✅ Fonction de transformation des données
 const formatEpisodesData = (data: any[]): Episode[] => {
   return data.map((ep) => ({
     id: ep.id?.toString(),
@@ -38,8 +39,7 @@ const formatEpisodesData = (data: any[]): Episode[] => {
   }));
 };
 
-
-export const useEpisodes = (options: UseEpisodesOptions = {}) => {
+export const useEpisodes = (options: UseEpisodesOptions = { favorites: false }) => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,12 +50,16 @@ export const useEpisodes = (options: UseEpisodesOptions = {}) => {
 
     try {
       let data;
-      if (options.podcastId) {
+
+      if (options.favorites) {
+        data = await getUserFavorites();
+      } else if (options.podcastId) {
         data = await getEpisodesByPodcastId(options.podcastId);
       } else {
-console.log("no podcast id ")      }
+        console.log("Ni podcastId ni favoris fournis.");
+        data = [];
+      }
 
-      // ✅ Appliquer le formatage ici
       setEpisodes(formatEpisodesData(data));
     } catch (err: any) {
       setError(err.message || "Erreur lors de la récupération des épisodes");
@@ -67,7 +71,7 @@ console.log("no podcast id ")      }
 
   useEffect(() => {
     fetchEpisodes();
-  }, [options.podcastId]);
+  }, [options.podcastId, options.favorites]);
 
   return {
     episodes,

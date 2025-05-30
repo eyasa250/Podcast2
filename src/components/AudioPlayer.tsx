@@ -19,7 +19,7 @@ export const AudioPlayer = () => {
       <MovingText text={activeTrack.title} />
       {activeTrack.artist && <Text style={styles.artist}>{activeTrack.artist}</Text>}
       <PlayerProgressBar />
-      <PlayerControls />
+      <PlayerControls style={styles.controls} />
     </View>
   );
 };
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: 20,
+    paddingHorizontal: 20,
   },
   artwork: {
     width: 250,
@@ -37,7 +38,11 @@ const styles = StyleSheet.create({
   },
   artist: {
     fontSize: 16,
-    color: 'lightgray',
+    color: 'white',
     marginTop: 4,
+    marginBottom: 16,
+  },
+  controls: {
+    marginTop: 24,
   },
 });

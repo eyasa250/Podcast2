@@ -11,24 +11,20 @@ export default function PodcastScreen() {
   if (loading) return <Text>Loading your podcasts...</Text>;
   if (error) return <Text>Error: {error}</Text>;
 
+  // Ajoute l'item spécial à la fin
+  const dataWithAddNew = [...podcasts, { id: "add-new", isAddNew: true }];
+
   return (
     <View style={styles.container}>
-
-<TouchableOpacity style={styles.fab} onPress={() => router.push("/(tabs)/podcasts/create")}>
-  <Ionicons name="add" size={24} color="#fff" />
-</TouchableOpacity>
-
-{/*       <TouchableOpacity
-        style={{ marginBottom: 20, alignSelf: "flex-end" }}
-        onPress={() => router.push("/(tabs)/podcasts/stepper")}
-      >
-        <Text style={styles.link}>+ New Episode</Text>
-      </TouchableOpacity> */}
-
-      <PodcastGrid data={podcasts} />
+      {/* On supprime le FAB existant car on va l'intégrer dans la grille */}
+      <PodcastGrid
+        data={dataWithAddNew}
+        onAddPress={() => router.push("/(tabs)/podcasts/create")}
+      />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

@@ -53,7 +53,11 @@ const PlayerScreen = () => {
       </View>
     );
   }
-
+const openModal = () => {
+  requestAnimationFrame(() => {
+    modalRef.current?.open();
+  });
+};
   return (
     <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
@@ -65,7 +69,7 @@ const PlayerScreen = () => {
           <Text style={styles.headerTitle} numberOfLines={1}>
             Lecture en cours
           </Text>
-          <TouchableOpacity onPress={() => modalRef.current?.open()}>
+            <TouchableOpacity onPress={openModal}>
             <FontAwesome6 name="ellipsis-vertical" size={25} color="white" />
           </TouchableOpacity>
         </View>

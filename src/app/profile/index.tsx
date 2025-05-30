@@ -1,65 +1,79 @@
-import React from 'react';
-import { View, Text, Button, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Assure-toi d'avoir installé la bibliothèque d'icônes
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/useAuth';
 import { router } from 'expo-router';
+import theme, { fontSize } from '@/core/theme';
+import { PodcastGrid } from '@/components/PodcastGrid';
+import { usePodcasts } from '@/hooks/usePodcasts';
 
 const ProfileScreen = () => {
-  const { signOut, user } = useAuth();  // Accède aux données de l'utilisateur via useAuth
+  const { signOut, user } = useAuth();
+  const { podcasts, loading, error } = usePodcasts({ own: true });
 
-  if (!user) {
-    return <Text>Chargement...</Text>;  // Affiche un message pendant que les données de l'utilisateur se chargent
-  }
+  if (!user) return <Text style={styles.loading}>Chargement...</Text>;
+  const dataWithAddNew = [...podcasts, { id: "add-new", isAddNew: true }];
 
   return (
-    <ScrollView style={styles.container}>
-      {/* En-tête */}
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
+      {/* Header avec fond dégradé */}
       <View style={styles.header}>
-        <Image
-          source={{ uri: user.profilePic }}  // Affiche la photo de profil de l'utilisateur
-          style={styles.profilePic}
-        />
-        <Text style={styles.username}>{user.username}</Text>
-        <Text style={styles.role}>
-          {user.role === 'PODCASTER' ? 'Podcasteur Premium' : 'Auditeur'}
-        </Text>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/profile/settingScreen')}>
+          <Text style={styles.settingsText}>Settings</Text>
+        </TouchableOpacity>
+
+        <Image source={{ uri: user.profilePic }} style={styles.avatar} />
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.city}>{user.role}</Text>
+
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statText}>70</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statText}>12,560</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Bio */}
-      <Text style={styles.bio}>
-        {user.bio || 'Aucune bio définie.'}
-      </Text>
+      {/* Badges */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>your podcasts</Text>
+        {/* <View style={styles.badgesContainer}>
+          {[...Array(8)].map((_, i) => (
+            <View key={i} style={styles.badge}>
+              <Ionicons name="medal-outline" size={28} color="#555" />
+            </View>
+          ))}
+        </View> */}
+          <View style={styles.container}>
+              {/* On supprime le FAB existant car on va l'intégrer dans la grille */}
+              <PodcastGrid
+                data={dataWithAddNew}
+                onAddPress={() => router.push("/(tabs)/podcasts/create")}
+              />
+            </View>
+      </View>
 
-      {/* Section des abonnements ou podcasts selon le rôle */}
-      {user.role === 'PODCASTER' ? (
-        <>
-  
+      {/* Liste d’éléments récents */}
+      <View style={styles.section}>
+        <ItemRow title="Crispy Calamari" date="24 July" time="10.00 AM" coins="12,560" />
+        <ItemRow title="Teatro Cubano" date="26 July" time="12.00 PM" coins="10,560" />
+      </View>
 
-          {/* Statistiques */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Statistiques</Text>
-            <Text style={styles.stat}>Abonnés: 1,200</Text>
-            <Text style={styles.stat}>Lectures: 10,000</Text>
-          </View>
-        </>
-      ) : (
-        <>
-          {/* Mes Abonnements */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Mes Abonnements</Text>
-            <Text style={styles.stat}>Podcast 1 - Titre</Text>
-            <Text style={styles.stat}>Podcast 2 - Titre</Text>
-          </View>
-        </>
-      )}
-<TouchableOpacity
-  style={[styles.button, { backgroundColor: '#2196F3', marginBottom: 20 }]}
-  onPress={() => router.push('/profile/settingScreen')}
->
-  <Ionicons name="settings-outline" size={24} color="white" />
-  <Text style={styles.buttonText}>Paramètres</Text>
-</TouchableOpacity>
-
+      {/* Bouton bas */}
+      <TouchableOpacity style={styles.ctaButton}>
+        {/* <Ionicons name="share-social-outline" size={20} color="#fff" /> */}
+        <Text style={styles.ctaText}>pass to premium</Text>
+      </TouchableOpacity>
+      
       {/* Section Déconnexion */}
       <View style={styles.logoutSection}>
         <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
@@ -71,84 +85,64 @@ const ProfileScreen = () => {
   );
 };
 
+const ItemRow = ({ title, date, time, coins }: { title: string; date: string; time: string; coins: string }) => (
+  <View style={styles.itemRow}>
+    <View>
+      <Text style={styles.itemTitle}>{title}</Text>
+      <Text style={styles.itemMeta}>{date}   •   {time}</Text>
+    </View>
+    <View style={styles.itemRight}>
+      <Text style={styles.itemCoins}>{coins}</Text>
+      <Ionicons name="restaurant-outline" size={20} color="#888" />
+    </View>
+  </View>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FAFAFA',
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  profilePic: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 10,
-    borderWidth: 3,
-    borderColor: '#4CAF50', // Bordure verte pour attirer l'attention sur l'image de profil
-  },
-  username: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  role: {
-    fontSize: 16,
+  loading: {
+    textAlign: 'center',
+    marginTop: 50,
+    fontSize: fontSize.sm,
     color: '#888',
   },
-  bio: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    color: '#555',
-    marginBottom: 20,
-  },
-  section: {
-    marginBottom: 25,
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    color: '#333',
-  },
-  stat: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 8,
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 12,
-    borderRadius: 30,
-    flexDirection: 'row',
+  header: {
+    backgroundColor: theme.colors.primary,
+    paddingTop: 60,
+    paddingBottom: 30,
     alignItems: 'center',
-    justifyContent: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    position: 'relative',
   },
-  buttonText: {
+  settingsButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: '#FF7A3E',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  settingsText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  avatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    marginBottom: 10,
+  },
+    logoutButtonText: {
     color: 'white',
     fontSize: 16,
     marginLeft: 10,
   },
-  logoutSection: {
+    logoutSection: {
     marginTop: 30,
     alignItems: 'center',
   },
@@ -160,11 +154,98 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logoutButtonText: {
-    color: 'white',
+  name: {
+    fontSize: 22,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  city: {
+    color: '#e0e0e0',
+    marginBottom: 10,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 10,
+  },
+  statBox: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignItems: 'center',
+    gap: 8,
+  },
+  statText: {
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingTop: 25,
+  },
+  sectionTitle: {
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  badge: {
+    backgroundColor: '#F5F5F5',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemRow: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 2,
+  },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  itemMeta: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  itemRight: {
+    alignItems: 'flex-end',
+  },
+  itemCoins: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFC107',
+    marginBottom: 4,
+  },
+  ctaButton: {
+    backgroundColor: '#E91E63',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 30,
+  },
+  ctaText: {
+    color: '#fff',
+    fontWeight: 'bold',
     marginLeft: 10,
   },
 });
-
 export default ProfileScreen;

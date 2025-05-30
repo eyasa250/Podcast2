@@ -14,7 +14,7 @@ const getAuthHeaders = async () => {
 // ✅ S'abonner à un podcast
 export const subscribeToPodcast = async (podcastId: number) => {
   const headers = await getAuthHeaders();
-  return axios.post(`/subscriptions/subscribe/${podcastId}`, {}, headers);
+  return axios.post(`/subscriptions/subscribe/${podcastId}`,  headers);
 };
 
 // ✅ Se désabonner d'un podcast

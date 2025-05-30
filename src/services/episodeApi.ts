@@ -1,7 +1,7 @@
 import axios from "axios";
 import { List } from "react-native-paper";
 
-const API_BASE_URL = "http://192.168.1.20:3001";
+const API_BASE_URL = "http://192.168.11.40:3001";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -47,7 +47,7 @@ const api = axios.create({
     } as any);
   }
 
-  const response = await fetch(`http://192.168.1.20:3001/episodes/${podcastId}/add`, {
+  const response = await fetch(`http://192.168.11.40:3001/episodes/${podcastId}/add`, {
     method: 'POST',
     body: formData,
   });
@@ -57,7 +57,7 @@ const api = axios.create({
 }; */
 export const uploadEpisode = async (podcastId: string, formData: FormData) => {
   
-  const response = await fetch(`http://192.168.1.20:3001/episodes/${podcastId}/add`, {
+  const response = await fetch(`http://192.168.11.40:3001/episodes/${podcastId}/add`, {
     method: 'POST',
     body: formData,
   });

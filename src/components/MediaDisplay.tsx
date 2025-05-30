@@ -1,68 +1,53 @@
-// MediaDisplay.tsx
-import React, { useEffect, useRef } from 'react'
-import { View, StyleSheet } from 'react-native'
-import Video from 'react-native-video'
-import FastImage from 'react-native-fast-image'
-import { useProgress } from 'react-native-track-player'
-import { colors } from '@/core/theme'
+// components/MediaDisplay.tsx
+import { View, Image, StyleSheet } from 'react-native';
+import { unknownTrackImageUri } from '@/constants/images';
+import { Video } from 'react-native-video';
 
-type Props = {
-  url: string
-  artwork: string
-  isPlaying: boolean
-  trackType: 'video' | 'audio'
-  onVideoEnd?: () => void
+interface Props {
+  type: 'AUDIO' | 'VIDEO';
+  artwork?: string;
+  videoUrl?: string;
 }
 
-export const MediaDisplay = ({ url, artwork, isPlaying, trackType, onVideoEnd }: Props) => {
-  const videoRef = useRef<any>(null)
-  const { position } = useProgress()
-
-  // Sync la position de la vidéo avec TrackPlayer
-  useEffect(() => {
-    if (trackType === 'video' && videoRef.current && position) {
-      videoRef.current.seek(position)
-    }
-  }, [position, trackType])
+export const MediaDisplay = ({ type, artwork, videoUrl }: Props) => {
+  if (type === 'VIDEO' && videoUrl) {
+    return (
+      <View style={styles.mediaContainer}>
+        <Video
+          source={{ uri: videoUrl }}
+          style={styles.video}
+          controls
+          resizeMode="cover"
+        />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      {trackType === 'video' ? (
-        <Video
-          ref={videoRef}
-          source={{ uri: url }}
-          style={styles.video}
-          paused={!isPlaying}
-          resizeMode="contain"
-          controls={false}
-          onEnd={onVideoEnd}
-        />
-      ) : (
-        <FastImage
-          style={styles.image}
-          source={{ uri: artwork }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-      )}
-    </View>
-  )
-}
+    <Image
+      source={{ uri: artwork || unknownTrackImageUri }}
+      style={styles.artwork}
+    />
+  );
+};
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+  mediaContainer: {
+    width: 300,
+    height: 300,
+    backgroundColor: '#000',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginTop: 20,
   },
   video: {
     width: '100%',
     height: '100%',
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
+  artwork: {
+    width: 300,
+    height: 300,
+    borderRadius: 8,
+    marginTop: 20,
   },
-})
+});
