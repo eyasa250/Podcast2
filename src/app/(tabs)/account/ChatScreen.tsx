@@ -37,7 +37,7 @@ const [messages, setMessages] = useState<Message[]>([]);
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.11.40:3001/chatbot/ask', {
+      const response = await fetch('http://192.168.1.22:3001/chatbot/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

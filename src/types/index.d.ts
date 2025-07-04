@@ -27,7 +27,7 @@ interface Episode {
     [lang: string]: string; // e.g. "fr", "en", "ar"
   };
   soundEnhancementUrl: string | null;
-  tags: string; // JSON string like '["dev", "audio"]'
+tags: string[];
   audience: "GENERAL" | "KIDS" | "MATURE";
   createdAt: string; // ISO date
   podcastId: number;
@@ -50,6 +50,7 @@ export interface Podcast {
   author: string;
   image: Image;
   userId: number,
+  imageFile?: any;
 
 }
 

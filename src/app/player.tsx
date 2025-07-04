@@ -11,8 +11,13 @@ import { colors } from '@/core/theme';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { useActiveTrack } from 'react-native-track-player';
-import { TextTrackType } from 'react-native-video'; // 👈 requis pour les sous-titres
-
+import { ISO639_1, TextTrackType } from 'react-native-video'; // 👈 requis pour les sous-titres
+interface SubtitleTrack {
+  title: string;
+  language: ISO639_1;
+  type: TextTrackType;
+  uri: string;
+}
 const isVideoUrl = (url: string) =>
   url?.endsWith('.mp4') || url?.includes('video') || url?.includes('.m3u8'); // simple heuristique
 
@@ -22,37 +27,35 @@ const PlayerScreen = () => {
   const activeTrack = useActiveTrack();
 
   const {
-    trackType,
+   // trackType,
     videoUrl,
     transcriptionUrls,
   } = useLocalSearchParams<{
-    trackType: 'AUDIO' | 'VIDEO';
+  //  trackType: 'AUDIO' | 'VIDEO';
     videoUrl?: string;
     transcriptionUrls?: string;
   }>();
 
-  const subtitles = transcriptionUrls
-    ? Object.entries(JSON.parse(transcriptionUrls)).map(([lang, uri]) => ({
+const subtitles: SubtitleTrack[] = transcriptionUrls
+  ? Object.entries(JSON.parse(transcriptionUrls)).map(([lang, uri]) => {
+      console.log(`📥 Subtitle parsed: [${lang}] => ${uri}`);
+      return {
         title: lang.toUpperCase(),
-        language: lang,
+        language: lang as ISO639_1,
         type: TextTrackType.VTT,
-        uri,
-      }))
-    : [];
+        uri: uri as string,
+      };
+    })
+  : [];
+
+console.log('🎬 Subtitle list final:', subtitles);
+
+
 
   const videoSourceUrl = videoUrl;
   const audioSourceUrl = activeTrack?.url;
 
-  const showVideo = trackType === 'VIDEO' && videoSourceUrl;
-  const showAudio = trackType === 'AUDIO' && activeTrack;
 
-  if (trackType === 'AUDIO' && !activeTrack) {
-    return (
-      <View style={[defaultStyles.container, { justifyContent: 'center' }]}>
-        <ActivityIndicator color={colors.icon} />
-      </View>
-    );
-  }
 const openModal = () => {
   requestAnimationFrame(() => {
     modalRef.current?.open();
@@ -75,11 +78,11 @@ const openModal = () => {
         </View>
 
         {/* Player */}
-        {showVideo ? (
-          <VideoPlayer url={videoSourceUrl!} />
-        ) : (
+        {/* {showVideo ? ( */}
+          <VideoPlayer url={videoSourceUrl!} textTracks={subtitles} />
+      {/*   ) : (
           <AudioPlayer />
-        )}
+        )} */}
 
         {/* Options */}
         {activeTrack && (

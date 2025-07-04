@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = "http://192.168.11.40:3001"; 
+const API_BASE_URL = "http:/192.168.1.22:3001"; 
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -70,33 +70,21 @@ export const getPodcastById = async (id: number) => {
     throw error;
   }
 };
-/* // Fonction pour récupérer les podcasts de l'utilisateur connecté
-export const getMyPodcasts = async () => {
-  try {
-    const response = await api.get("/podcasts/my");
-    return response.data;
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error("Erreur lors de la récupération des podcasts de l'utilisateur :", error.response?.data || error.message);
-    } else {
-      console.error("Erreur inconnue :", error);
-    }
-    throw error;
-  }
-}; */
+
 
 // Fonction pour créer un podcast
-export const createPodcast = async (title: string, description: string,category: string) => {
-  const token = await AsyncStorage.getItem("auth_token"); // ← CORRECT maintenant
+export const createPodcast = async (formData: FormData) => {
+  const token = await AsyncStorage.getItem("auth_token");
 
   if (!token) throw new Error("Token non trouvé");
 
-  const response = await axios.post(
-    `${API_BASE_URL}/podcasts/add`,
-    { title, description,category },
+  const response = await api.post(
+    `/podcasts/add`,
+    formData,
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", 
       },
     }
   );

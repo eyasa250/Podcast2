@@ -1,53 +1,18 @@
-/* import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
-export default function App() {
-  return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <RootNavigation />
-        <StatusBar style="auto" />
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
-  );
-}
-
-const RootNavigation = () => {
-  return (  // Ajout du return ici
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="player" options={{ 
-        presentation:'card',
-        gestureEnabled:true,
-        gestureDirection:'vertical',
-        animationDuration:400,
-        headerShown:false
-
-      }} />
-
-    </Stack>
-  );
-};
- */
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-export default function App() {
+export default function AppLayout() {
   return (
-
-
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Slot /> 
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Laisse Expo Router générer les routes automatiquement */}
+        </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>
     </SafeAreaProvider>
-
- );
+  );
 }

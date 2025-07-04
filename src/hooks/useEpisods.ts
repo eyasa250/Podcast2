@@ -18,7 +18,7 @@ const formatEpisodesData = (data: any[]): Episode[] => {
     description: ep.description || "No description",
     trackType: ep.trackType || "AUDIO",
     audience: ep.audience || "GENERAL",
-    tags: ep.tags ? JSON.parse(ep.tags) : [],
+    tags: Array.isArray(ep.tags) ? ep.tags : JSON.parse(ep.tags || '[]'),
     createdAt: ep.createdAt,
     audioUrl: ep.audioUrl || null,
     videoUrl: ep.videoUrl || null,

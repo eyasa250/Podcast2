@@ -36,7 +36,7 @@ const theme = {
     ...DefaultTheme.colors, // ⚠️ S'assure que DefaultTheme.colors existe
     primary: "#4C4C9D",
     secondary: "#1F2732",
-    background: "#000",
+    background:'#FAFAFA',
     text: "#2F2F2FFF",
     textMuted: "#9ca3af",
     icon: "#fff",

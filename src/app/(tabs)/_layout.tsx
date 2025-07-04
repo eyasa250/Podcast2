@@ -6,7 +6,6 @@ import { FloatingPlayer } from "@/components/FloatingPlayer";
 import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
 import { useLogTrackPlayerState } from "@/hooks/useLogTrackPlayerState";
 import { colors, fontSize } from "@/core/theme";
-import AvatarButton from "@/components/AvatarButton";
 import { useAuth } from "@/hooks/useAuth";
 
 SplashScreen.preventAutoHideAsync();
@@ -22,9 +21,7 @@ const TabsNavigation = () => {
 
   useSetupTrackPlayer({ onLoad: handleTrackPlayerLoaded });
 
-  const renderAvatar = () => {
-    return user ? <AvatarButton /> : null;
-  };
+
 
   return (
     <FloatingPlayerProvider>
@@ -40,7 +37,7 @@ const TabsNavigation = () => {
             backgroundColor: "white",
           },
           headerTintColor: "white",
-          headerLeft: renderAvatar, // ✅ Ajout global basé sur auth
+    //    headerLeft: renderAvatar, // ✅ Ajout global basé sur auth
           tabBarStyle: {
             position: "absolute",
             borderTopLeftRadius: 20,
@@ -67,18 +64,18 @@ const TabsNavigation = () => {
           }}
         />
         <Tabs.Screen
-          name="podcasts"
+          name="library"
           options={{
-            title: "podcasts",
-            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="podcast" size={28} color={color} />,
+            title: "library",
+            tabBarIcon: ({ color }) => <FontAwesome6 name="bookmark" size={28} color={color} />,
           }}
         />
         <Tabs.Screen
           name="account"
           options={{
             title: "Account",
-            tabBarIcon: ({ color }) => <FontAwesome6 name="crown" size={20} color={color} />,
-          }}
+            tabBarIcon: ({ color }) => <FontAwesome6 name="crown" size={20} color={color} />
+ }}
         />
       </Tabs>
 

@@ -10,7 +10,7 @@ type Props = {
 export const EpisodeCard = ({ episode, onPress }: Props) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Image source={{ uri: episode.imageUrl }} style={styles.image} />
+      <Image source={{ uri: episode.coverImageUrl }} style={styles.image} />
 
       <View style={styles.content}>
         <Text style={styles.date}>4 days ago</Text>

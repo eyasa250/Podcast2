@@ -18,7 +18,7 @@ export const EpisodeList = ({ data }: { data: Episode[] }) => {
     router.push('/player'); // Redirige vers PlayerScreen
   }; */
 const handleTrackSelect = async (episode: Episode) => {
-  if (episode.trackType === 'AUDIO') {
+ /*  if (episode.trackType === 'AUDIO') {
     const track: Track = {
       id: episode.id.toString(),
       title: episode.title,
@@ -31,7 +31,7 @@ const handleTrackSelect = async (episode: Episode) => {
     await TrackPlayer.play();
 
     router.push('/player'); // audio player
-  } else {
+  } else { */
     router.push({
       pathname: '/player',
       params: {
@@ -39,11 +39,11 @@ const handleTrackSelect = async (episode: Episode) => {
         artist: episode.podcast.title,
         artwork: episode.coverImageUrl,
         videoUrl: episode.videoUrl!,
-        trackType: episode.trackType,
+       // trackType: episode.trackType,
         transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
       },
     });
-  }
+  
 };
 
 

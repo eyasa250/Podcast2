@@ -24,11 +24,10 @@ export const PodcastGrid = ({ data, horizontal = false, onAddPress }: Props) => 
 
   const handlePress = (podcast: Podcast) => {
     router.push({
-      pathname: "/(tabs)/podcasts/podcastDetails",
+      pathname: "/podcast/podcastDetailsScreen",
       params: {
         id: podcast.id,
-        title: podcast.title,
-        author: podcast.author,
+    
       },
     });
   };

@@ -27,7 +27,7 @@ const PlayerScreen = () => {
   const modalRef = useRef<Modalize>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<ISO639_1>('en'); // Langue par défaut
-  const videoUrl = 'http://192.168.11.40:3001/uploads/sample.mp4';
+  const suburl = 'http://192.168.1.22:3001/uploads/subtitlefrench.vtt';
 
 // Log activeTrack details
 useEffect(() => {
