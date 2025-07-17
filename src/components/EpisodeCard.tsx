@@ -1,11 +1,16 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Episode } from "@/types";
-
+import { formatDistanceToNow, parseISO } from "date-fns";
+const convertToISO = (dateString: string) => {
+  return dateString.replace(" ", "T") + "Z";
+};
 type Props = {
   episode: Episode;
   onPress: () => void;
+
 };
+
 
 export const EpisodeCard = ({ episode, onPress }: Props) => {
   return (
@@ -13,15 +18,17 @@ export const EpisodeCard = ({ episode, onPress }: Props) => {
       <Image source={{ uri: episode.coverImageUrl }} style={styles.image} />
 
       <View style={styles.content}>
-        <Text style={styles.date}>4 days ago</Text>
+<Text style={styles.date}>
+  {episode.createdAt
+    ? formatDistanceToNow(parseISO(convertToISO(episode.createdAt)), { addSuffix: true })
+    : "4h"}
+</Text>
         <Text style={styles.title} numberOfLines={1}>{episode.title}</Text>
         <Text style={styles.artist}>{episode.tags}</Text>
       </View>
 
-      <View style={styles.actions}>
-        <Ionicons name="heart-outline" size={20} color="#555" style={styles.icon} />
-        <Entypo name="dots-three-vertical" size={16} color="#555" />
-      </View>
+
+
     </TouchableOpacity>
   );
 };

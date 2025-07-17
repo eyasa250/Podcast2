@@ -39,8 +39,7 @@ const StepOptions = ({
   <Picker.Item label="VIDEO" value="VIDEO" />
 </Picker>
 
-   {/* Toggle Sous-titres */}
-   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+   {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
     <Text>Subtitles</Text>
     <Switch
       value={formData.subtitles}
@@ -48,14 +47,13 @@ const StepOptions = ({
     />
   </View>
 
-  {/* Toggle Amélioration du son */}
   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
     <Text>Sound Enhancement</Text>
     <Switch
       value={formData.soundEnhancement}
       onValueChange={(value) => setFormData('soundEnhancement', value)}
     />
-  </View>
+  </View> */}
     </View>
   );
 };

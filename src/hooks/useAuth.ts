@@ -61,7 +61,7 @@ export const useAuth = () => {
       setUser(data);
       await AsyncStorage.setItem("user", JSON.stringify(data)); // 👈 Sauvegarde tout l'objet utilisateur
     } catch (err: any) {
-      console.error("Erreur lors de la récupération des infos utilisateur:", err.message);
+    //  console.error("Erreur lors de la récupération des infos utilisateur:", err.message);
     } finally {
       setLoading(false);
     }

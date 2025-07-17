@@ -21,20 +21,20 @@ const setupPlayer = async () => {
 	await TrackPlayer.setRepeatMode(RepeatMode.Queue)
 }
 
-export const useSetupTrackPlayer = ({ onLoad }: { onLoad?: () => void }) => {
-	const isInitialized = useRef(false)
+// export const useSetupTrackPlayer = ({ onLoad }: { onLoad?: () => void }) => {
+// 	const isInitialized = useRef(false)
 
-	useEffect(() => {
-		if (isInitialized.current) return
+// 	useEffect(() => {
+// 		if (isInitialized.current) return
 
-		setupPlayer()
-			.then(() => {
-				isInitialized.current = true
-				onLoad?.()
-			})
-			.catch((error) => {
-				isInitialized.current = false
-				console.error(error)
-			})
-	}, [onLoad])
-}
+// 		setupPlayer()
+// 			.then(() => {
+// 				isInitialized.current = true
+// 				onLoad?.()
+// 			})
+// 			.catch((error) => {
+// 				isInitialized.current = false
+// 				console.error(error)
+// 			})
+// 	}, [onLoad])
+// }

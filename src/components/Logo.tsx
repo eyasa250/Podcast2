@@ -4,7 +4,7 @@ import { Image, StyleSheet } from "react-native";
 export default function Logo(): JSX.Element {
   return (
     <Image
-      source={require("@/assets/items/logo.png")}
+      source={require("@/assets/items/logo.jpeg")}
       style={styles.image}
     />
   );
@@ -12,8 +12,8 @@ export default function Logo(): JSX.Element {
 
 const styles = StyleSheet.create({
   image: {
-    width: 110,
-    height: 110,
+    width: 300,
+    height: 45,
     marginBottom: 8,
   },
 });

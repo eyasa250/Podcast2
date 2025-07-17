@@ -1,5 +1,5 @@
 // hooks/useFavorites.ts
-import { addView, getTotalEpisodeViews, getTotalPodcastViews } from "@/services/viewApi";
+import { addView, getTotalEpisodeViews, getTotalPodcastViews, getViewHistory } from "@/services/viewApi";
 import { useState } from "react";
 
 
@@ -29,6 +29,21 @@ export const useView = () => {
       setLoading(false);
     }
   };
+  // hooks/useView.ts
+const history = async () => {
+  try {
+    setLoading(true);
+    const views = await getViewHistory(); // chaque vue contient .episode
+    return views.map((view: any) => view.episode); // ✅ extrait les épisodes
+  } catch (err: any) {
+    setError(err.message);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const newView = async (episodeId: number) => {
     try {
       setLoading(true);
@@ -48,5 +63,6 @@ export const useView = () => {
     TotalPodcastViews,
     TotalEpisodesViews,
     newView,
+    history
   };
 };

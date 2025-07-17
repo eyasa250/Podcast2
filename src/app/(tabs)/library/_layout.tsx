@@ -7,11 +7,10 @@ const libraryLayout =()=> {
         <Stack>
             <Stack.Screen name="index" 
              options={{headerShown:false}}/>
-            <Stack.Screen name="create" options={{ headerShown: false }} />
-            <Stack.Screen name="podcastDetails" options={{ headerShown: false }} />
-            <Stack.Screen name="CreateEpisodeScreen" options={{ headerShown: false }} />
-            <Stack.Screen name="FavoritesScreen" options={{ headerShown: false }} />
+            <Stack.Screen name="episodeListScreen" options={{ headerShown: false }} />
+            <Stack.Screen name="podcastListScreen" options={{ headerShown: false }} />
 
+         
         </Stack>
     </View>
 }

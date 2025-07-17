@@ -3,28 +3,31 @@ import { FontAwesome6, MaterialCommunityIcons, Ionicons } from "@expo/vector-ico
 import { SplashScreen, Tabs } from "expo-router";
 import { FloatingPlayerProvider } from "@/hooks/FloatingPlayerContext";
 import { FloatingPlayer } from "@/components/FloatingPlayer";
-import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
+//import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
 import { useLogTrackPlayerState } from "@/hooks/useLogTrackPlayerState";
 import { colors, fontSize } from "@/core/theme";
 import { useAuth } from "@/hooks/useAuth";
+import SessionInitializer from "@/components/SessionInitializer";
 
 SplashScreen.preventAutoHideAsync();
 
 const TabsNavigation = () => {
   const { user } = useAuth();
 
-  useLogTrackPlayerState();
+  // useLogTrackPlayerState();
 
-  const handleTrackPlayerLoaded = useCallback(() => {
-    SplashScreen.hideAsync();
-  }, []);
+  // const handleTrackPlayerLoaded = useCallback(() => {
+  //   SplashScreen.hideAsync();
+  // }, []);
 
-  useSetupTrackPlayer({ onLoad: handleTrackPlayerLoaded });
+  // useSetupTrackPlayer({ onLoad: handleTrackPlayerLoaded });
 
 
 
   return (
     <FloatingPlayerProvider>
+            <SessionInitializer />
+
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: colors.primary,

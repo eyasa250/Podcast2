@@ -13,7 +13,7 @@ export const usePodcastDetails = (podcastId: string) => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://192.168.1.22:3001/podcasts/${podcastId}`);
+        const res = await fetch(`http://192.168.1.18:3001/podcasts/${podcastId}`);
         if (!res.ok) throw new Error("Erreur de chargement");
         const data: Podcast = await res.json();
         setPodcast(data);

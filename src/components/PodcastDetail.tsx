@@ -1,29 +1,31 @@
-// components/PodcastDetail.tsx
 import React from "react";
-import { Alert, Button, ScrollView, View } from "react-native";
+import { Alert, View, FlatList } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
-import { usePodcastDetails } from "@/hooks/usePodcastDetails";
-import { useEpisodes } from "@/hooks/useEpisods";
 import { useSubscriberCount } from "@/hooks/useSubscriberCount";
 import { PodcastHeader } from "@/components/PodcastHeader";
 import { PodcastActions } from "@/components/PodcastActions";
-import { EpisodeList } from "@/components/EpisodeList";
-import { unknownPodcastImageUri } from "@/constants/images";
+import { EpisodeCard } from "@/components/EpisodeCard";
 import { router } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { Episode } from "@/types";
 
-type Props = {
-  podcastId: string;
-
-};
-
-export const PodcastDetail = ({ podcastId }: Props) => {
+export const PodcastDetail = () => {
   const { user } = useAuth();
-  const { podcast } = usePodcastDetails(podcastId);
-  console.log("podcast id:", podcastId)
 
-  const { episodes } = useEpisodes({ podcastId, favorites: false });
-  const { count, isSubscribed, subscribe, unsubscribe, loading } = useSubscriberCount(Number(podcastId));
-console.log("podcast details", podcast)
+  const { selected: podcast, selectedId } = useSelector(
+    (state: RootState) => state.podcasts
+  );
+
+  const episodes = useSelector((state: RootState) => state.episodes.byPodcast);
+
+  const {
+    count,
+    isSubscribed,
+    subscribe,
+    unsubscribe,
+    loading,
+  } = useSubscriberCount(Number(selectedId));
 
   const handleSubscribePress = () => {
     if (isSubscribed) {
@@ -45,31 +47,58 @@ console.log("podcast details", podcast)
     }
   };
 
+  const handleTrackSelect = (episode: Episode) => {
+    router.push({
+      pathname: '/player',
+      params: {
+        id: episode.id,
+        title: episode.title,
+        description: episode.description,
+        podcast: episode.podcast.title,
+        podcastId: episode.podcastId,
+        artwork: episode.coverImageUrl,
+        videoUrl: episode.videoUrl!,
+        transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
+      },
+    });
+  };
+
+  if (!podcast) return null;
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
-
-      <PodcastHeader
-        coverImage={podcast?.imageFile}
-        title={podcast?.title ?? ""}
-        description={podcast?.description ?? ""}
-        author={podcast?.author ?? ""}
-        subscriberCount={count}
-      />
-
-      <PodcastActions
-        isOwner={podcast?.userId === user?.id}
-       onAddEpisode={() =>
-            router.push(`/podcast/createEpisode?id=${podcastId}`)
-        }
-        onSubscribe={handleSubscribePress}
-        subscribing={loading}
-        isSubscribed={isSubscribed}
-        subscriberCount={count}
-      />
-
-      <View style={{ paddingHorizontal: 20 }}>
-        <EpisodeList data={episodes} />
-      </View>
-    </ScrollView>
+    <FlatList
+      data={episodes}
+      keyExtractor={(item) => item.id.toString()}
+      ListHeaderComponent={
+        <>
+          <PodcastHeader
+            coverImage={podcast.imageFile}
+            title={podcast.title}
+            description={podcast.description}
+            author={podcast.author ?? ""}
+            subscriberCount={count}
+          />
+          <PodcastActions
+            isOwner={podcast.userId === user?.id}
+            onAddEpisode={() =>
+              router.push(`/podcast/createEpisode?id=${selectedId}`)
+            }
+            onSubscribe={handleSubscribePress}
+            subscribing={loading}
+            isSubscribed={isSubscribed}
+            subscriberCount={count}
+          />
+        </>
+      }
+      renderItem={({ item }) => (
+        <View style={{ marginBottom: 8, paddingHorizontal: 16 }}>
+          <EpisodeCard
+            episode={item}
+            onPress={() => handleTrackSelect(item)}
+          />
+        </View>
+      )}
+      contentContainerStyle={{ paddingBottom: 80 }}
+    />
   );
 };

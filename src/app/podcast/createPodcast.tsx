@@ -5,12 +5,15 @@ import { Picker } from "@react-native-picker/picker";
 import { createPodcast } from "@/services/podcastApi"; // ⚠️ Make sure the path is correct
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import { addPodcast } from "@/store/slices/podcastSlice";
 
 export default function CreatePodcastScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
     const [image, setImage] = useState("");
+const dispatch = useAppDispatch();
 
   const router = useRouter();
 const pickImage = async () => {
@@ -55,8 +58,10 @@ const handleCreate = async () => {
       } as any); // `as any` pour éviter l'erreur de type
     }
 
-    const response = await createPodcast(formData); // ⚠️ change cette fonction
-    console.log("Podcast created:", response);
+    // const response = await createPodcast(formData); // ⚠️ change cette fonction
+      await dispatch(addPodcast(formData));
+
+    // console.log("Podcast created:", response);
     Alert.alert("Success", "Podcast created successfully!");
     router.back()  
 } catch (error: any) {

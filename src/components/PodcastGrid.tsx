@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { PodcastGridItem } from "./PodcastGridItem";
 import { Ionicons } from "@expo/vector-icons";
 import { Podcast } from "@/types";
-
+import { useDispatch } from "react-redux";
+import { setSelectedPodcastId } from "@/store/slices/podcastSlice";
 type AddNewItem = {
   id: string;
   isAddNew: boolean;
@@ -22,15 +23,13 @@ const ITEM_WIDTH = (width - 48) / 2;
 export const PodcastGrid = ({ data, horizontal = false, onAddPress }: Props) => {
   const router = useRouter();
 
-  const handlePress = (podcast: Podcast) => {
-    router.push({
-      pathname: "/podcast/podcastDetailsScreen",
-      params: {
-        id: podcast.id,
-    
-      },
-    });
-  };
+
+const dispatch = useDispatch();
+
+const handlePress = (podcast: Podcast) => {
+  dispatch(setSelectedPodcastId(podcast.id)); // ✅ définit l'ID sélectionné
+  router.push("/podcast/podcastDetailsScreen"); // pas besoin de passer id
+};
 
   const renderItem = ({ item }: { item: Podcast & { isAddNew?: boolean } }) => {
     if (item.isAddNew) {

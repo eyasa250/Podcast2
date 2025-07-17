@@ -7,17 +7,17 @@ import { useFavorites } from "@/hooks/useFavorite";
 import { colors } from "@/core/theme";
 import { TagList } from "@/components/TagList";
 
-const FavoritesScreen = () => {
+const LibraryScreen = () => {
   const { user } = useAuth();
   const { getUserFavorites, loading, error } = useFavorites();
   const [episodes, setEpisodes] = useState([]);
 
   const loadFavorites = async () => {
     if (!user?.id) return;
-    const data = await getUserFavorites(user.id);
+    const data = await getUserFavorites();
     setEpisodes(data || []);
   };
-const staticTags = ['Inspiration', 'Technologie', 'Humour', 'Musique', 'Développement'];
+//const staticTags = ['Inspiration', 'Technologie', 'Humour', 'Musique', 'Développement'];
 
   useFocusEffect(
     useCallback(() => {
@@ -31,9 +31,9 @@ const staticTags = ['Inspiration', 'Technologie', 'Humour', 'Musique', 'Dévelop
     <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
       
       <View style={{ padding: 20 }}>
- <View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
+ {/* <View style={{ paddingHorizontal: 20, marginBottom: 10 }}>
   <TagList tags={staticTags} onTagPress={(tag) => console.log(`Tag pressé : ${tag}`)} />
-</View>
+</View> */}
 
 
 
@@ -44,4 +44,4 @@ const staticTags = ['Inspiration', 'Technologie', 'Humour', 'Musique', 'Dévelop
   );
 };
 
-export default FavoritesScreen;
+export default LibraryScreen;

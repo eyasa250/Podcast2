@@ -1,8 +1,6 @@
 // RecentlyPlayed.tsx
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
-import { EpisodeList } from "@/components/EpisodeList";
-import library from "@/assets/library.json";  // Vous pouvez personnaliser les données ici
 import { PodcastGrid } from "./PodcastGrid";
 
 const RecentlyPlayed = ({ data }: { data: any[] }) => {

@@ -11,9 +11,13 @@ import { uploadEpisode } from '@/services/episodeApi';
 import { useEpisodeForm } from '@/hooks/useEpisodeForm';
 import { EpisodeFormData } from '@/types';
 import { ActivityIndicator, Text } from 'react-native';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import { addEpisode, fetchEpisodesByPodcast } from '@/store/slices/episodeSlice';
+
 
 const StepperScreen = () => {
 const { formData, updateField} = useEpisodeForm();
+const dispatch = useAppDispatch();
 
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
@@ -42,8 +46,6 @@ const buildFormDataFromEpisode = (episodeData: EpisodeFormData): FormData => {
   formData.append('description', episodeData.description);
   formData.append('trackType', episodeData.trackType);
   formData.append('audience', episodeData.audience);
-  formData.append('subtitles', episodeData.subtitles.toString());
-  formData.append('soundEnhancement', episodeData.soundEnhancement.toString());
 
   episodeData.tags
     .map(tag => tag.trim())
@@ -119,21 +121,27 @@ if (episodeData.imageFile) {
         <ProgressStep
                 label="Vérification"
                onSubmit={async () => {
-                    try {
-                      setIsSubmitting(true); // 🔄 Début du chargement
-                      console.log('🎯 FormData Final:', formData);
-                      const builtFormData = buildFormDataFromEpisode(formData);
-                      const response = await uploadEpisode(Id, builtFormData);
-                      console.log('Réponse du serveur:', response);
-                      router.back();
+  try {
+    setIsSubmitting(true);
+    const builtFormData = buildFormDataFromEpisode(formData);
 
-                      // router.replace('/(tabs)/podcasts/podcastDetails');
-                    } catch (error) {
-                      console.error('Erreur upload:', error);
-                    } finally {
-                      setIsSubmitting(false); // ✅ Fin du chargement
-                    }
-                  }}
+    const resultAction = await dispatch(addEpisode({ podcastId: Id, formData: builtFormData }));
+await dispatch(fetchEpisodesByPodcast(Id));
+
+    if (addEpisode.fulfilled.match(resultAction)) {
+      console.log('✅ Épisode ajouté via Redux:', resultAction.payload);
+      router.back(); // ou router.replace(...) si tu veux rediriger ailleurs
+    } else {
+      console.error('❌ Erreur Redux:', resultAction.payload || resultAction.error);
+    }
+
+  } catch (error) {
+    console.error('❌ Erreur générale:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+}}
+
 
 
         >

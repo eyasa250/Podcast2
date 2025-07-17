@@ -5,23 +5,19 @@ import { router } from "expo-router";
 
 const PremiumCard = () => {
   return (
-    <View style={styles.container}>
-      <Image
-        source={{ uri: "https://via.placeholder.com/300x200" }}
-        style={styles.image}
-      />
-      <Text style={styles.title}>Passez à Premium</Text>
+     <View style={styles.container}>
+      <Text style={styles.title}>Become Premium</Text>
       <Text style={styles.description}>
-        Débloquez du contenu exclusif, profitez d'une expérience sans pub et bien plus encore !
+        Unlock exclusive content, enjoy an ad-free experience, and much more!
       </Text>
       <View style={styles.benefitsContainer}>
-        <Text style={styles.benefit}>✅ Accès illimité aux fonctionnalités</Text>
-        <Text style={styles.benefit}>✅ Contenu exclusif</Text>
-        <Text style={styles.benefit}>✅ Aucune publicité</Text>
-        <Text style={styles.benefit}>✅ Support prioritaire</Text>
+        <Text style={styles.benefit}>✅ Unlimited access to all features</Text>
+        <Text style={styles.benefit}>✅ Exclusive content</Text>
+        <Text style={styles.benefit}>✅ No advertisements</Text>
+        <Text style={styles.benefit}>✅ Priority support</Text>
       </View>
       <TouchableOpacity style={styles.button} onPress={() => router.push("/account/plans")}>
-        <Text style={styles.buttonText}>Passer à Premium</Text>
+        <Text style={styles.buttonText}>Upgrade to Premium</Text>
       </TouchableOpacity>
     </View>
   );

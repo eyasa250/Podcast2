@@ -1,21 +1,28 @@
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// services/authApi.ts
 
-const API_URL = "http://192.168.1.22:3001"; // Assure-toi que l'IP correspond bien à ton backend
+import api from "lib/axios";
 
-// Fonction de connexion
+// 🔐 Fonction de connexion
 export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-  console.log('Réponse complète après login:', response.data);  // Logue toute la réponse
- // console.log('Token reçu après login:', response.data.access_token); // Logue le token
+  try {
+   
+    const response = await api.post("/auth/login", { email, password });
 
-  return response.data;
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Erreur lors du login :", error?.response?.data || error.message);
+    throw error; // important pour que Redux puisse capturer l’erreur
+  }
 };
 
-
-// Fonction d'inscription
-export const register = async (name: string, email: string, password: string, confirmPassword: string) => {
-  const response = await axios.post(`${API_URL}/auth/signup`, {
+// 📝 Fonction d'inscription
+export const register = async (
+  name: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+) => {
+  const response = await api.post("/auth/signup", {
     name,
     email,
     password,
@@ -24,28 +31,14 @@ export const register = async (name: string, email: string, password: string, co
   return response.data;
 };
 
-// Fonction pour récupérer les infos utilisateur
+// 👤 Récupérer les infos de l'utilisateur connecté
 export const getUserInfo = async () => {
-  const token = await AsyncStorage.getItem("auth_token");
-
-  if (!token) throw new Error("Aucun token trouvé");
-
-  const response = await axios.get(`${API_URL}/users/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
+  const response = await api.get("/users/me");
   return response.data;
 };
-// Fonction pour changer le rôle de l'utilisateur vers "PODCASTER"
+
+// 🔁 Changer le rôle vers PODCASTER
 export const upgradeToPodcaster = async () => {
-  const token = await AsyncStorage.getItem("auth_token");
-
-  if (!token) throw new Error("Aucun token trouvé");
-
-  const response = await axios.patch(`${API_URL}/users/upgrade-to-podcaster`, null, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
+  const response = await api.patch("/users/upgrade-to-podcaster");
   return response.data;
 };
-

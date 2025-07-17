@@ -15,15 +15,18 @@
       ],
       "@/assets/*": [
         "./assets/*"
+      ],
+      "@env": [
+        "./types/env"
       ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.json",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "**/*.json"
+    "expo-env.d.ts"
   ],
   "exclude": [
     "node_modules"

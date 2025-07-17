@@ -1,21 +1,23 @@
-import { useAuth } from "@/hooks/useAuth";
-import { router, Stack } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { Stack, router } from "expo-router";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { upgradeRole } from "@/store/slices/authSlice";
+
 
 export default function PaymentScreen() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [name, setName] = useState("");
-  const { upgradeRole, loading } = useAuth();
 
-  const handlePayment  = async ()=> {
-    // Logique de paiement (par exemple, appel API pour payer)
-    console.log("Détails de paiement:", { cardNumber, expiryDate, cvv, name });
-      try {
-      await upgradeRole(); // 🔁 mise à jour du rôle
-      router.replace("/home"); // ✅ redirection après succès
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.auth);
+
+  const handlePayment = async () => {
+    try {
+      await dispatch(upgradeRole()).unwrap(); // unwrap pour gérer les erreurs directement
+      router.replace("/home");
     } catch (err) {
       Alert.alert("Erreur", "Le paiement a échoué ou le rôle n'a pas pu être mis à jour.");
     }
@@ -29,7 +31,6 @@ export default function PaymentScreen() {
         <View style={styles.card}>
           <Text style={styles.subHeader}>Détails de la carte</Text>
 
-          {/* Nom sur la carte */}
           <TextInput
             style={styles.input}
             placeholder="Nom sur la carte"
@@ -37,18 +38,14 @@ export default function PaymentScreen() {
             onChangeText={setName}
             autoCapitalize="words"
           />
-
-          {/* Numéro de carte */}
           <TextInput
             style={styles.input}
             placeholder="Numéro de carte"
             value={cardNumber}
             onChangeText={setCardNumber}
             keyboardType="numeric"
-            maxLength={19} // Format standard pour les cartes de paiement
+            maxLength={19}
           />
-
-          {/* Date d'expiration */}
           <View style={styles.row}>
             <TextInput
               style={[styles.input, styles.halfWidth]}
@@ -56,9 +53,8 @@ export default function PaymentScreen() {
               value={expiryDate}
               onChangeText={setExpiryDate}
               keyboardType="numeric"
-              maxLength={5} // Format MM/AA
+              maxLength={5}
             />
-            {/* CVV */}
             <TextInput
               style={[styles.input, styles.halfWidth]}
               placeholder="CVV"
@@ -68,9 +64,7 @@ export default function PaymentScreen() {
               maxLength={3}
             />
           </View>
-
-          {/* Bouton de paiement */}
-          <TouchableOpacity style={styles.button}  onPress={handlePayment}  disabled={loading}>
+          <TouchableOpacity style={styles.button} onPress={handlePayment} disabled={loading}>
             <Text style={styles.buttonText}>Payer maintenant</Text>
           </TouchableOpacity>
         </View>
@@ -78,6 +72,9 @@ export default function PaymentScreen() {
     </>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {

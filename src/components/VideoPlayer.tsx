@@ -26,6 +26,17 @@ export const VideoPlayer = ({ url, textTracks = [] }: Props) => {
 
   return (
     <View style={styles.container}>
+            {/* 🈯 Bouton "Langue" */}
+      {textTracks.length > 1 && (
+        <TouchableOpacity
+          style={styles.languageSelectorButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.languageSelectorText}>
+             Langue: {selectedLanguage.toUpperCase()}
+          </Text>
+        </TouchableOpacity>
+      )}
       <Video
         source={{ uri: url }}
         style={styles.video}
@@ -39,17 +50,7 @@ export const VideoPlayer = ({ url, textTracks = [] }: Props) => {
         onError={(e) => console.error('Video error:', e)}
       />
 
-      {/* 🈯 Bouton "Langue" */}
-      {textTracks.length > 1 && (
-        <TouchableOpacity
-          style={styles.languageSelectorButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.languageSelectorText}>
-            🈯 Langue: {selectedLanguage.toUpperCase()}
-          </Text>
-        </TouchableOpacity>
-      )}
+
 
       {/* 📋 Modal de sélection */}
       <Modal

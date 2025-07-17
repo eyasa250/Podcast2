@@ -8,7 +8,7 @@ import { getUserFavorites } from "@/services/favoritesApi";
 
 type UseEpisodesOptions = {
   podcastId?: string | number;
-  favorites: boolean;
+  favorites?: boolean;
 };
 
 const formatEpisodesData = (data: any[]): Episode[] => {
@@ -63,7 +63,7 @@ export const useEpisodes = (options: UseEpisodesOptions = { favorites: false }) 
       setEpisodes(formatEpisodesData(data));
     } catch (err: any) {
       setError(err.message || "Erreur lors de la récupération des épisodes");
-      console.error("Erreur API:", err);
+     // console.error("Erreur API:", err);
     } finally {
       setLoading(false);
     }

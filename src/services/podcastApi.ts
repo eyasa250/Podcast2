@@ -1,32 +1,10 @@
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = "http:/192.168.1.22:3001"; 
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-
-});
+import api from "lib/axios";
 
 
-// Intercepteur pour ajouter automatiquement le token à chaque requête
-api.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem("auth_token");
-    console.log("Token récupéré:", token); // Ajout du log
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-  //    console.log("Headers envoyés:", config.headers); // Ajout du log
-
-    }else
-     {  
-        console.error("Aucun token trouvé !");
-      }
-    return config;
-  },
-  (error) => Promise.reject(error)
-); 
 // Fonction pour récupérer les podcasts d'un utilisateur spécifique
 export const getPodcastsByUser = async (userId: string) => {
   try {
