@@ -1,20 +1,27 @@
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FontAwesome6 } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Modalize } from 'react-native-modalize';
-import { TrackOptionsModal } from '@/components/TrackOptionsModal';
-import { defaultStyles } from '@/styles';
-import { colors } from '@/core/theme';
-import { AudioPlayer } from '@/components/AudioPlayer';
-import { VideoPlayer } from '@/components/VideoPlayer';
-import { useActiveTrack } from 'react-native-track-player';
-import { ISO639_1, TextTrackType } from 'react-native-video'; // 👈 requis pour les sous-titres
-import { EpisodeList } from '@/components/EpisodeList';
-import { useEpisodes } from '@/hooks/useEpisods';
-import { useView } from '@/hooks/useView';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { Modalize } from "react-native-modalize";
+import { TrackOptionsModal } from "@/components/TrackOptionsModal";
+import { VideoPlayer } from "@/components/VideoPlayer";
+import { useActiveTrack } from "react-native-track-player";
+import { ISO639_1, TextTrackType } from "react-native-video";
+import { EpisodeList } from "@/components/EpisodeList";
+import { useEpisodes } from "@/hooks/useEpisods";
+import { useView } from "@/hooks/useView";
+import Constants from "expo-constants";
 
 interface SubtitleTrack {
   title: string;
@@ -22,99 +29,83 @@ interface SubtitleTrack {
   type: TextTrackType;
   uri: string;
 }
-const isVideoUrl = (url: string) =>
-  url?.endsWith('.mp4') || url?.includes('video') || url?.includes('.m3u8'); // simple heuristique
+
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl ; // idéalement depuis .env
 
 const PlayerScreen = () => {
   const { top, bottom } = useSafeAreaInsets();
   const modalRef = useRef<Modalize>(null);
   const activeTrack = useActiveTrack();
-const { TotalEpisodesViews, newView } = useView();
-const [episodeViews, setEpisodeViews] = useState<number>(0);
-console.log("welcome")
-const {
-  id,
-  videoUrl,
-  transcriptionUrls,
-  description,
-  podcast,
-  podcastId,
-  title,
-  likes,
-  views,
-} = useLocalSearchParams<{
-  id?:string;
-  videoUrl?: string;
-  transcriptionUrls?: string;
-  podcast?: string;
-  description?:string;
-  podcastId?: string;
-  title?: string;
-  likes?: string;
-  views?: string;
-}>();
+  const { TotalEpisodesViews, newView } = useView();
 
-const parsedEpisodeId = parseInt(id || '0', 10);
+  // Récupère l'épisode sélectionné depuis Redux
+  const episode = useSelector((state: RootState) => state.episodes.selected);
 
-const parsedLikes = parseInt(likes || '0', 10);
-const parsedViews = parseInt(views || '0', 10);
-const { episodes } = useEpisodes(podcastId ? { podcastId, favorites: false } : { favorites: false });
+  // Si aucun épisode sélectionné, afficher un message simple
+  if (!episode) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: "white" }}>Aucun épisode sélectionné.</Text>
+      </View>
+    );
+  }
 
-const subtitles: SubtitleTrack[] = transcriptionUrls
-  ? Object.entries(JSON.parse(transcriptionUrls)).map(([lang, uri]) => {
-      console.log(`📥 Subtitle parsed: [${lang}] => ${uri}`);
-      return {
-        title: lang.toUpperCase(),
-        language: lang as ISO639_1,
-        type: TextTrackType.VTT,
-        uri: uri as string,
-      };
+  const [episodeViews, setEpisodeViews] = useState<number>(0);
+  const hasFetchedViews = useRef(false);
+
+  // Sécuriser parsing des sous-titres
+const parsedSubtitles = episode.transcriptionUrls ?? {};
+
+
+  const subtitles: SubtitleTrack[] = Object.entries(parsedSubtitles).map(
+    ([lang, uri]) => ({
+      title: lang.toUpperCase(),
+      language: lang as ISO639_1,
+      type: TextTrackType.VTT,
+      uri: uri as string,
     })
-  : [];
+  );
 
-console.log('🎬 Subtitle list final:', subtitles);
+  // Fetch des vues une seule fois
+  useEffect(() => {
+    if (hasFetchedViews.current) return;
 
+    const fetchViews = async () => {
+      await newView(episode.id); // Incrémente la vue
+      const total = await TotalEpisodesViews(episode.id);
+      if (typeof total === "number") {
+        setEpisodeViews(total);
+      } else if (total?.total) {
+        setEpisodeViews(total.total);
+      }
+      hasFetchedViews.current = true;
+    };
 
-const hasFetchedViews = useRef(false);
+    fetchViews();
+  }, [episode.id, newView, TotalEpisodesViews]);
 
-useEffect(() => {
-  if (!parsedEpisodeId || hasFetchedViews.current) return;
-  //if (!parsedEpisodeId) return;
+  // Gérer URL vidéo
+  const videoSourceUrl = episode.videoUrl?.startsWith("http")
+    ? episode.videoUrl
+    : `${BASE_URL}${episode.videoUrl}`;
 
-  const fetchViews = async () => {
-    //console.log("welcome");
-    await newView(parsedEpisodeId); // ➕
-    const total = await TotalEpisodesViews(parsedEpisodeId);
-    if (typeof total === 'number') {
-      setEpisodeViews(total);
-    } else if (total?.total) {
-      setEpisodeViews(total.total);
-    }
-    hasFetchedViews.current = true;
+  const openModal = () => {
+    requestAnimationFrame(() => {
+      modalRef.current?.open();
+    });
   };
 
-  fetchViews();
-}, [parsedEpisodeId]);
+  // Récupère le titre et artiste pour le modal d'options (activeTrack ou fallback)
+  const trackTitle = activeTrack?.title ?? episode.title;
+  const trackArtist = activeTrack?.artist ?? episode.podcast;
 
-console.log('views number',episodeViews )
+  // Charger épisodes du même podcast pour afficher en dessous
+  const { episodes } = useEpisodes(
+    episode.podcastId ? { podcastId: episode.podcastId, favorites: false } : { favorites: false }
+  );
 
-const BASE_URL = 'http://192.168.1.17:3001'; // ou depuis .env
-
-const videoSourceUrl = videoUrl?.startsWith('http') 
-  ? videoUrl 
-  : `${BASE_URL}${videoUrl}`;
-
-  const audioSourceUrl = activeTrack?.url;
-
-
-const openModal = () => {
-  requestAnimationFrame(() => {
-    modalRef.current?.open();
-  });
-};
   return (
-    <LinearGradient style={{ flex: 1 }} colors={['#000', '#000']}>
-    
+    <LinearGradient style={{ flex: 1 }} colors={["#000", "#000"]}>
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -124,124 +115,100 @@ const openModal = () => {
           <Text style={styles.headerTitle} numberOfLines={1}>
             Lecture en cours
           </Text>
-            <TouchableOpacity onPress={openModal}>
+          <TouchableOpacity onPress={openModal}>
             <FontAwesome6 name="ellipsis-vertical" size={25} color="white" />
           </TouchableOpacity>
         </View>
       </View>
 
-        {/* Player */}
-        {/* {showVideo ? ( */}
-{videoSourceUrl ? (
-  <VideoPlayer url={videoSourceUrl} textTracks={subtitles} />
-) : (
-  <Text style={{ color: 'white', textAlign: 'center' }}>Aucune vidéo disponible</Text>
-)}
-      {/*   ) : (
-          <AudioPlayer />
-        )} */}
-{/* 🔻 TITRE + DESCRIPTION */}
-    <View style={{ flex: 1 }}>
-  <ScrollView>
-    <View style={styles.detailsContainer}>
-      <Text style={styles.episodeTitle}>{title}</Text>
-      <Text style={styles.episodeViews}>{episodeViews} views</Text>
-      <Text style={styles.episodeDescription}>{description}</Text>
-    </View>
-  </ScrollView>
+      {/* Player */}
+      {videoSourceUrl ? (
+        <VideoPlayer url={videoSourceUrl} textTracks={subtitles} />
+      ) : (
+        <Text style={{ color: "white", textAlign: "center", marginVertical: 20 }}>
+          Aucune vidéo disponible
+        </Text>
+      )}
 
-  <Text style={styles.sectionTitle}>More Episodes</Text>
-  <EpisodeList data={episodes} />
-</View>
+      {/* Infos épisode */}
+      <View style={{ flex: 1 }}>
+        <ScrollView>
+          <View style={styles.detailsContainer}>
+            <Text style={styles.episodeTitle}>{episode.title}</Text>
+            <Text style={styles.episodeViews}>{episodeViews} vues</Text>
+            <Text style={styles.episodeDescription}>{episode.description}</Text>
+          </View>
+        </ScrollView>
 
+        <Text style={styles.sectionTitle}>Autres épisodes</Text>
+        <EpisodeList data={episodes ?? []} />
+      </View>
 
-        {/* Options */}
-        {activeTrack && (
-          <TrackOptionsModal
-            ref={modalRef}
-            trackTitle={activeTrack.title}
-            artist={activeTrack.artist}
-            onLike={() => console.log('💖 Liked track')}
-            onAddTopodcast={() => console.log('➕ Added to podcast')}
-          />
-        )}
+      {/* Options du track */}
+      {activeTrack && (
+        <TrackOptionsModal
+          ref={modalRef}
+          trackTitle={trackTitle}
+          artist={trackArtist}
+          onLike={() => console.log("💖 Liked track")}
+          onAddTopodcast={() => console.log("➕ Added to podcast")}
+        />
+      )}
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     marginBottom: 20,
   },
   headerTitle: {
     flex: 1,
-    textAlign: 'center',
-    color: 'white',
+    textAlign: "center",
+    color: "white",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginHorizontal: 16,
   },
   episodeViews: {
-  color: '#aaa',
-  fontSize: 12,
-  marginBottom: 4,
-},
-
-  videoInfoContainer: {
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-  backgroundColor: '#111',
-  borderTopWidth: 1,
-  borderColor: '#222',
-},
-videoTitle: {
-  fontSize: 16,
-  fontWeight: 'bold',
-  color: '#fff',
-  marginBottom: 4,
-},
-videoAuthor: {
-  fontSize: 14,
-  color: '#aaa',
-  marginBottom: 8,
-},
-statsRow: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-},
-stat: {
-  fontSize: 14,
-  color: '#ccc',
-},
-detailsContainer: {
-  paddingHorizontal: 16,
-  paddingTop: 12,
-  paddingBottom: 8,
-},
-episodeTitle: {
-  color: '#fff',
-  fontSize: 16,
-  fontWeight: 'bold',
-  marginBottom: 4,
-},
-episodeDescription: {
-  color: '#ccc',
-  fontSize: 14,
-  lineHeight: 20,
-},
-sectionTitle: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#fff',
-  paddingHorizontal: 16,
-  marginTop: 16,
-  marginBottom: 8,
-},
-
+    color: "#aaa",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  detailsContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  episodeTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  episodeDescription: {
+    color: "#ccc",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    paddingHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
+  },
 });
 
 export default PlayerScreen;

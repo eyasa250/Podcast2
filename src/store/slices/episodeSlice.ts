@@ -1,5 +1,5 @@
 // store/slices/episodesSlice.ts
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Episode } from "@/types";
 import {
   getEpisodesByPodcastId,
@@ -98,6 +98,9 @@ const episodesSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+     selectEpisode: (state, action: PayloadAction<Episode>) => {
+      state.selected = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -131,5 +134,5 @@ const episodesSlice = createSlice({
   },
 });
 
-export const { clearEpisodes } = episodesSlice.actions;
+export const { clearEpisodes ,selectEpisode } = episodesSlice.actions;
 export default episodesSlice.reducer;

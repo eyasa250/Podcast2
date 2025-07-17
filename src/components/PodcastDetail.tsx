@@ -6,9 +6,10 @@ import { PodcastHeader } from "@/components/PodcastHeader";
 import { PodcastActions } from "@/components/PodcastActions";
 import { EpisodeCard } from "@/components/EpisodeCard";
 import { router } from "expo-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Episode } from "@/types";
+import { selectEpisode } from "@/store/slices/episodeSlice";
 
 export const PodcastDetail = () => {
   const { user } = useAuth();
@@ -16,7 +17,7 @@ export const PodcastDetail = () => {
   const { selected: podcast, selectedId } = useSelector(
     (state: RootState) => state.podcasts
   );
-
+ const dispatch = useDispatch();
   const episodes = useSelector((state: RootState) => state.episodes.byPodcast);
 
   const {
@@ -48,18 +49,19 @@ export const PodcastDetail = () => {
   };
 
   const handleTrackSelect = (episode: Episode) => {
+    dispatch(selectEpisode(episode));
     router.push({
       pathname: '/player',
-      params: {
-        id: episode.id,
-        title: episode.title,
-        description: episode.description,
-        podcast: episode.podcast.title,
-        podcastId: episode.podcastId,
-        artwork: episode.coverImageUrl,
-        videoUrl: episode.videoUrl!,
-        transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
-      },
+      // params: {
+      //   id: episode.id,
+      //   title: episode.title,
+      //   description: episode.description,
+      //   podcast: episode.podcast.title,
+      //   podcastId: episode.podcastId,
+      //   artwork: episode.coverImageUrl,
+      //   videoUrl: episode.videoUrl!,
+      //   transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
+      // },
     });
   };
 
