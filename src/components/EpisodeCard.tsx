@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Episode } from "@/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import Constants from "expo-constants";
 const convertToISO = (dateString: string) => {
   return dateString.replace(" ", "T") + "Z";
 };
@@ -11,11 +12,15 @@ type Props = {
 
 };
 
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 export const EpisodeCard = ({ episode, onPress }: Props) => {
+    const artworkUri = episode.coverImageUrl?.startsWith('http')
+    ? episode.coverImageUrl
+    : `${BASE_URL}${episode.coverImageUrl}`;
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Image source={{ uri: episode.coverImageUrl }} style={styles.image} />
+      <Image source={{ uri: artworkUri }} style={styles.image} />
 
       <View style={styles.content}>
 <Text style={styles.date}>

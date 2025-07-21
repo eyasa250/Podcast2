@@ -33,7 +33,12 @@ export const getAllPodcasts = async () => {
     throw error;
   }
 };
-
+export const updatePodcast = async (id: number, formData: FormData) => {
+  const response = await api.patch(`/podcasts/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
 // Fonction pour récupérer un podcast par ID
 export const getPodcastById = async (id: number) => {
   try {

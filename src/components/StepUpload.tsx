@@ -14,7 +14,7 @@ export default function StepUpload({ formData, setMediaFile }: StepUploadProps) 
   const [loading, setLoading] = useState(false);
 
   const pickMediaFile = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: 'video/*' });
+const result = await DocumentPicker.getDocumentAsync({ type: ['audio/*', 'video/*'] });
     if (!result.canceled && result.assets.length > 0) {
       setMediaFile(result.assets[0]);
     }
@@ -40,14 +40,22 @@ export default function StepUpload({ formData, setMediaFile }: StepUploadProps) 
 
       {loading && <ActivityIndicator size="large" color="#1db954" style={{ marginTop: 20 }} />}
 
-      {videoUri && !loading && (
-        <Video
-          source={{ uri: videoUri }}
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          style={styles.video}
-        />
-      )}
+     {videoUri && !loading && (
+  formData.mediaFile?.name?.match(/\.(mp4|mov|mkv|webm)$/i) ? (
+    <Video
+      source={{ uri: videoUri }}
+      resizeMode={ResizeMode.CONTAIN}
+      useNativeControls
+      style={styles.video}
+    />
+  ) : (
+    <View style={styles.audioPreview}>
+      <Icon name="musical-notes-outline" size={40} color="#1db954" />
+      <Text style={styles.audioText}>Fichier audio sélectionné</Text>
+    </View>
+  )
+)}
+
     </View>
   );
 }
@@ -82,6 +90,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 12,
   },
+  audioPreview: {
+  marginTop: 20,
+  padding: 20,
+  backgroundColor: '#f3f3f3',
+  borderRadius: 12,
+  alignItems: 'center',
+},
+audioText: {
+  marginTop: 10,
+  fontSize: 16,
+  color: '#555',
+  fontWeight: '600',
+},
+
   nextButton: {
     marginTop: 40,
     backgroundColor: '#1db954',

@@ -4,6 +4,7 @@ import {
   getAllPodcasts,
   getPodcastById,
   getPodcastsByUser,
+  updatePodcast,
 } from "@/services/podcastApi";
 import { Podcast } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,6 +52,13 @@ export const fetchPodcastDetails = createAsyncThunk("podcasts/fetchDetails", asy
 export const addPodcast = createAsyncThunk("podcasts/add", async (formData: FormData) => {
   return await createPodcast(formData);
 });
+// 🔁 Modifier un podcast
+export const editPodcast = createAsyncThunk(
+  "podcasts/edit",
+  async ({ id, formData }: { id: number; formData: FormData }) => {
+    return await updatePodcast(id, formData);
+  }
+);
 
 // 🔁 Abonnements de l’utilisateur
 export const fetchSubscriptions = createAsyncThunk("podcasts/fetchSubscriptions", async () => {
@@ -110,6 +118,13 @@ const podcastsSlice = createSlice({
       state.mine.push(action.payload);
       state.allpod.unshift(action.payload);
     });
+      builder.addCase(editPodcast.fulfilled, (state, action) => {
+        const updated = action.payload;
+        // Remplace dans `mine`
+        state.mine = state.mine.map((p) => (p.id === updated.id ? updated : p));
+        // Remplace aussi dans `allpod` si nécessaire
+        state.allpod = state.allpod.map((p) => (p.id === updated.id ? updated : p));
+      });
 
     builder
       .addCase(fetchSubscriptions.pending, (state) => {

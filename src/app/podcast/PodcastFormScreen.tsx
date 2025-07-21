@@ -1,21 +1,47 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
-import { createPodcast } from "@/services/podcastApi"; // ⚠️ Make sure the path is correct
+import { createPodcast, getPodcastById, updatePodcast } from "@/services/podcastApi"; // ⚠️ Make sure the path is correct
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { addPodcast } from "@/store/slices/podcastSlice";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { addPodcast, editPodcast } from "@/store/slices/podcastSlice";
 
-export default function CreatePodcastScreen() {
+export default function PodcastFormScreenScreen() {
+    const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-    const [image, setImage] = useState("");
-const dispatch = useAppDispatch();
+  const [image, setImage] = useState("");
 
-  const router = useRouter();
+const dispatch = useAppDispatch();
+const { mode, podcastId } = useAppSelector((state) => state.editPodcast);
+console.log("🧠 Mode reçu:", mode);
+console.log("🧠 PodcastId reçu:", podcastId);
+useEffect(() => {
+  const loadPodcast = async () => {
+    if (mode  && podcastId != null) {
+      try {
+        const podcast = await getPodcastById(Number(podcastId));
+        console.log("✅ Podcast trouvé:", podcast);
+        setTitle(podcast.title);
+        setDescription(podcast.description);
+        setCategory(podcast.category);
+        setImage(podcast.coverImageUrl);
+      } catch (error) {
+        console.error("❌ Erreur lors du chargement du podcast:", error);
+      }
+    } else {
+      console.log("⚠️ Pas en mode édition ou id null");
+    }
+  };
+
+  loadPodcast();
+}, [podcastId, mode]);
+
+
 const pickImage = async () => {
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -29,46 +55,39 @@ const pickImage = async () => {
 };
 
 const handleCreate = async () => {
-  if (!title.trim()) {
-    Alert.alert("Error", "Podcast title is required.");
-    return;
-  }
+  if (!title.trim()) return Alert.alert("Error", "Title required.");
+  if (!category) return Alert.alert("Error", "Category required.");
 
-  if (!category) {
-    Alert.alert("Error", "Please select a category.");
-    return;
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("category", category);
+
+  if (image && !image.startsWith("http")) {
+    const fileName = image.split("/").pop();
+    const ext = /\.(\w+)$/.exec(fileName || '')?.[1] || "jpg";
+
+    formData.append("coverImage", {
+      uri: image,
+      name: fileName,
+      type: `image/${ext}`,
+    } as any);
   }
 
   try {
-    const formData = new FormData();
-
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("category", category);
-
-    if (image) {
-      const fileName = image.split("/").pop();
-      const match = /\.(\w+)$/.exec(fileName || '');
-      const ext = match?.[1] ?? "jpg";
-
-      formData.append("coverImage", {
-        uri: image,
-        name: fileName,
-        type: `image/${ext}`,
-      } as any); // `as any` pour éviter l'erreur de type
-    }
-
-    // const response = await createPodcast(formData); // ⚠️ change cette fonction
+    if (mode ) {
+    await dispatch(editPodcast({ id: Number(podcastId), formData }));
+      Alert.alert("Updated!", "Podcast updated successfully.");
+    } else {
       await dispatch(addPodcast(formData));
-
-    // console.log("Podcast created:", response);
-    Alert.alert("Success", "Podcast created successfully!");
-    router.back()  
-} catch (error: any) {
-    console.error("API error:", error);
-    Alert.alert("Error", error?.response?.data?.message || "Failed to create podcast.");
+      Alert.alert("Created!", "Podcast created successfully.");
+    }
+    router.back();
+  } catch (error: any) {
+    Alert.alert("Error", error?.response?.data?.message || "An error occurred.");
   }
 };
+
 
 
   return (

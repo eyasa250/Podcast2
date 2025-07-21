@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Episode } from "@/types";
 import { selectEpisode } from "@/store/slices/episodeSlice";
+import { setEditPodcast } from "@/store/slices/editPodcastSlice";
 
 export const PodcastDetail = () => {
   const { user } = useAuth();
@@ -47,21 +48,16 @@ export const PodcastDetail = () => {
       subscribe();
     }
   };
+const handleEditPodcast = () => {
+  dispatch(setEditPodcast({ mode: "edit", podcastId: selectedId }));
+  router.push("/podcast/PodcastFormScreen");
+};
 
   const handleTrackSelect = (episode: Episode) => {
     dispatch(selectEpisode(episode));
     router.push({
       pathname: '/player',
-      // params: {
-      //   id: episode.id,
-      //   title: episode.title,
-      //   description: episode.description,
-      //   podcast: episode.podcast.title,
-      //   podcastId: episode.podcastId,
-      //   artwork: episode.coverImageUrl,
-      //   videoUrl: episode.videoUrl!,
-      //   transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
-      // },
+    
     });
   };
 
@@ -85,6 +81,7 @@ export const PodcastDetail = () => {
             onAddEpisode={() =>
               router.push(`/podcast/createEpisode?id=${selectedId}`)
             }
+            onEditPodcast={handleEditPodcast} // ✅ nouveau
             onSubscribe={handleSubscribePress}
             subscribing={loading}
             isSubscribed={isSubscribed}

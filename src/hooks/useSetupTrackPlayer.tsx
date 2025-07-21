@@ -1,40 +1,44 @@
-import { useEffect, useRef } from 'react'
-import TrackPlayer, { Capability, RatingType, RepeatMode } from 'react-native-track-player'
+import { useEffect, useRef, useState } from 'react';
+import TrackPlayer, { Capability, RatingType, RepeatMode } from 'react-native-track-player';
 
-const setupPlayer = async () => {
-	await TrackPlayer.setupPlayer({
-		maxCacheSize: 1024 * 10,
-	})
+let playerInitialized = false;
 
-	await TrackPlayer.updateOptions({
-		ratingType: RatingType.Heart,
-		capabilities: [
-			Capability.Play,
-			Capability.Pause,
-			Capability.SkipToNext,
-			Capability.SkipToPrevious,
-			Capability.Stop,
-		],
-	})
+export const useSetupTrackPlayer = () => {
+  const initialized = useRef(false);
+  const [isReady, setIsReady] = useState(false);
 
-	await TrackPlayer.setVolume(0.3) // not too loud
-	await TrackPlayer.setRepeatMode(RepeatMode.Queue)
-}
+  useEffect(() => {
+    const setup = async () => {
+      if (playerInitialized || initialized.current) {
+        setIsReady(true);
+        return;
+      }
 
-// export const useSetupTrackPlayer = ({ onLoad }: { onLoad?: () => void }) => {
-// 	const isInitialized = useRef(false)
+      try {
+        await TrackPlayer.setupPlayer({ maxCacheSize: 1024 * 10 });
+        await TrackPlayer.updateOptions({
+          ratingType: RatingType.Heart,
+          capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.Stop,
+          ],
+        });
+        await TrackPlayer.setVolume(0.3);
+        await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 
-// 	useEffect(() => {
-// 		if (isInitialized.current) return
+        initialized.current = true;
+        playerInitialized = true;
+        setIsReady(true);
+      } catch (error) {
+        console.error('TrackPlayer setup error:', error);
+      }
+    };
 
-// 		setupPlayer()
-// 			.then(() => {
-// 				isInitialized.current = true
-// 				onLoad?.()
-// 			})
-// 			.catch((error) => {
-// 				isInitialized.current = false
-// 				console.error(error)
-// 			})
-// 	}, [onLoad])
-// }
+    setup();
+  }, []);
+
+  return isReady;
+};

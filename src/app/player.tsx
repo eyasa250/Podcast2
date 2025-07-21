@@ -5,7 +5,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,6 +21,9 @@ import { EpisodeList } from "@/components/EpisodeList";
 import { useEpisodes } from "@/hooks/useEpisods";
 import { useView } from "@/hooks/useView";
 import Constants from "expo-constants";
+import { AudioPlayer } from "@/components/AudioPlayer";
+import TrackPlayer from "react-native-track-player";
+import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
 
 interface SubtitleTrack {
   title: string;
@@ -30,18 +32,19 @@ interface SubtitleTrack {
   uri: string;
 }
 
-const BASE_URL = Constants.expoConfig?.extra?.apiUrl ; // idéalement depuis .env
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 const PlayerScreen = () => {
+  // --- Hooks de layout & refs ---
   const { top, bottom } = useSafeAreaInsets();
   const modalRef = useRef<Modalize>(null);
   const activeTrack = useActiveTrack();
   const { TotalEpisodesViews, newView } = useView();
 
-  // Récupère l'épisode sélectionné depuis Redux
+  // --- Récupération de l'épisode sélectionné dans le store Redux ---
   const episode = useSelector((state: RootState) => state.episodes.selected);
 
-  // Si aucun épisode sélectionné, afficher un message simple
+  // --- Gestion de l'absence d'épisode sélectionné ---
   if (!episode) {
     return (
       <View style={styles.centered}>
@@ -50,13 +53,27 @@ const PlayerScreen = () => {
     );
   }
 
+  // --- State pour le nombre de vues de l’épisode ---
   const [episodeViews, setEpisodeViews] = useState<number>(0);
   const hasFetchedViews = useRef(false);
 
-  // Sécuriser parsing des sous-titres
-const parsedSubtitles = episode.transcriptionUrls ?? {};
+  // --- Détection du type média : audio ou vidéo ---
+  const isAudio = !!episode.audioUrl;
+  const isVideo = !!episode.videoUrl;
 
+  // --- Construction des URLs complètes des médias ---
+  const audioSourceUrl = episode.audioUrl?.startsWith("http")
+    ? episode.audioUrl
+    : `${BASE_URL}${episode.audioUrl}`;
+  const coverSourceUrl = episode.coverImageUrl?.startsWith("http")
+    ? episode.coverImageUrl
+    : `${BASE_URL}${episode.coverImageUrl}`;
+  const videoSourceUrl = episode.videoUrl?.startsWith("http")
+    ? episode.videoUrl
+    : `${BASE_URL}${episode.videoUrl}`;
 
+  // --- Préparation des pistes de sous-titres ---
+  const parsedSubtitles = episode.transcriptionUrls ?? {};
   const subtitles: SubtitleTrack[] = Object.entries(parsedSubtitles).map(
     ([lang, uri]) => ({
       title: lang.toUpperCase(),
@@ -66,12 +83,12 @@ const parsedSubtitles = episode.transcriptionUrls ?? {};
     })
   );
 
-  // Fetch des vues une seule fois
+  // --- Effet pour récupérer et afficher le nombre de vues ---
   useEffect(() => {
     if (hasFetchedViews.current) return;
 
     const fetchViews = async () => {
-      await newView(episode.id); // Incrémente la vue
+      await newView(episode.id);
       const total = await TotalEpisodesViews(episode.id);
       if (typeof total === "number") {
         setEpisodeViews(total);
@@ -84,30 +101,67 @@ const parsedSubtitles = episode.transcriptionUrls ?? {};
     fetchViews();
   }, [episode.id, newView, TotalEpisodesViews]);
 
-  // Gérer URL vidéo
-  const videoSourceUrl = episode.videoUrl?.startsWith("http")
-    ? episode.videoUrl
-    : `${BASE_URL}${episode.videoUrl}`;
+  // --- Initialisation du player audio ---
+  useSetupTrackPlayer();
 
+  // --- Effet pour gérer le chargement et la lecture audio ---
+  useEffect(() => {
+    let isMounted = true;
+
+    console.log('Audio URL:', audioSourceUrl);
+
+    const setupAudio = async () => {
+      try {
+        if (isAudio && audioSourceUrl && isMounted) {
+          await TrackPlayer.reset();
+          await TrackPlayer.add({
+            id: episode.id.toString(),
+            url: audioSourceUrl,
+            title: episode.title,
+            artist:
+              typeof episode.podcast === "string"
+                ? episode.podcast
+                : episode.podcast?.title || "Inconnu",
+            artwork: coverSourceUrl,
+          });
+          await TrackPlayer.play();
+        } else if (!isAudio) {
+          await TrackPlayer.pause(); // Stop playback if it's not audio
+        }
+      } catch (error) {
+        console.error("Erreur TrackPlayer:", error);
+      }
+    };
+
+    setupAudio();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [episode, isAudio]);
+
+  // --- Fonction pour ouvrir le modal d’options du track ---
   const openModal = () => {
     requestAnimationFrame(() => {
       modalRef.current?.open();
     });
   };
 
-  // Récupère le titre et artiste pour le modal d'options (activeTrack ou fallback)
+  // --- Titres affichés dans le player (audio) ---
   const trackTitle = activeTrack?.title ?? episode.title;
   const trackArtist = activeTrack?.artist ?? episode.podcast;
 
-  // Charger épisodes du même podcast pour afficher en dessous
+  // --- Chargement des autres épisodes du podcast ---
   const { episodes } = useEpisodes(
-    episode.podcastId ? { podcastId: episode.podcastId, favorites: false } : { favorites: false }
+    episode.podcastId
+      ? { podcastId: episode.podcastId, favorites: false }
+      : { favorites: false }
   );
 
   return (
     <LinearGradient style={{ flex: 1 }} colors={["#000", "#000"]}>
+      {/* --- Header avec bouton retour et options --- */}
       <View style={{ paddingTop: top + 40, paddingBottom: bottom + 20 }}>
-        {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()}>
             <FontAwesome6 name="arrow-left" size={25} color="white" />
@@ -121,35 +175,43 @@ const parsedSubtitles = episode.transcriptionUrls ?? {};
         </View>
       </View>
 
-      {/* Player */}
-      {videoSourceUrl ? (
+      {/* --- Zone de lecture : vidéo, audio ou message d’absence de contenu --- */}
+      {isVideo && videoSourceUrl ? (
         <VideoPlayer url={videoSourceUrl} textTracks={subtitles} />
-      ) : (
-        <Text style={{ color: "white", textAlign: "center", marginVertical: 20 }}>
-          Aucune vidéo disponible
+      ) : isAudio && audioSourceUrl ? (
+          <View style={{ paddingBottom: 30 }}>
+            <AudioPlayer />
+          </View>   
+             ) : (
+        <Text
+          style={{ color: "white", textAlign: "center", marginVertical: 20 }}
+        >
+          Aucun contenu disponible
         </Text>
       )}
 
-      {/* Infos épisode */}
+      {/* --- Informations détaillées sur l’épisode --- */}
       <View style={{ flex: 1 }}>
         <ScrollView>
-          <View style={styles.detailsContainer}>
-            <Text style={styles.episodeTitle}>{episode.title}</Text>
-            <Text style={styles.episodeViews}>{episodeViews} vues</Text>
-            <Text style={styles.episodeDescription}>{episode.description}</Text>
-          </View>
-        </ScrollView>
+  {isVideo && (
+  <View style={styles.detailsContainer}>
+    <Text style={styles.episodeTitle}>{episode.title}</Text>
+    <Text style={styles.episodeViews}>{episodeViews} vues</Text>
+    <Text style={styles.episodeDescription}>{episode.description}</Text>
+  </View>
+)}
+        {/* --- Liste des autres épisodes --- */}
+         <EpisodeList data={episodes ?? []} />
+                </ScrollView>
 
-        <Text style={styles.sectionTitle}>Autres épisodes</Text>
-        <EpisodeList data={episodes ?? []} />
       </View>
 
-      {/* Options du track */}
+      {/* --- Modal d’options du track si un track actif est présent --- */}
       {activeTrack && (
         <TrackOptionsModal
           ref={modalRef}
           trackTitle={trackTitle}
-          artist={trackArtist}
+          // artist={trackArtist} // optionnel
           onLike={() => console.log("💖 Liked track")}
           onAddTopodcast={() => console.log("➕ Added to podcast")}
         />

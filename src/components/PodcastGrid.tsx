@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Podcast } from "@/types";
 import { useDispatch } from "react-redux";
 import { setSelectedPodcastId } from "@/store/slices/podcastSlice";
+import { useAppSelector } from "@/hooks/reduxHooks";
+import { setEditPodcast } from "@/store/slices/editPodcastSlice";
 type AddNewItem = {
   id: string;
   isAddNew: boolean;
@@ -22,6 +24,7 @@ const ITEM_WIDTH = (width - 48) / 2;
 
 export const PodcastGrid = ({ data, horizontal = false, onAddPress }: Props) => {
   const router = useRouter();
+  const { user } = useAppSelector((state) => state.auth);
 
 
 const dispatch = useDispatch();
@@ -44,6 +47,7 @@ const handlePress = (podcast: Podcast) => {
         </TouchableOpacity>
       );
     }
+  const isOwner = item.userId === user?.id;
 
     return (
       <View style={{ width: horizontal ? 140 : ITEM_WIDTH, marginRight: horizontal ? 12 : 0 }}>

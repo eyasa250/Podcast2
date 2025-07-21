@@ -45,7 +45,7 @@ export const useAuth = () => {
     try {
       await AsyncStorage.removeItem("auth_token");
       setUser(null); // ou undefined selon ton useState
-      router.replace("/(tabs)/home"); // ou autre route selon ton app
+      router.replace("/(tabs)/account/auth"); // ou autre route selon ton app
     } catch (err) {
       console.error("Erreur lors de la déconnexion :", err);
     } finally {

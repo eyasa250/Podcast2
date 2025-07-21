@@ -28,7 +28,7 @@ const list = isSubscriptions
   const title = isSubscriptions ? "My Subscriptions" : "Mes Podcasts";
   const handlePress = (podcast: any) => {
     if (podcast.isAddNew) {
-      router.push("/podcast/createPodcast");
+      router.push("/podcast/PodcastFormScreen");
     } else {
       dispatch(setSelectedPodcastId(podcast.id));
       router.push("/podcast/podcastDetailsScreen");
@@ -44,7 +44,7 @@ const list = isSubscriptions
         ) : (
           <PodcastGrid
             data={list}
-            onAddPress={() => router.push("/podcast/createPodcast")}
+            onAddPress={() => router.push("/podcast/PodcastFormScreen")}
           />
         )}
       </View>

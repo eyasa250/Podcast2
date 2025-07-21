@@ -2,22 +2,21 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { EpisodeCard } from './EpisodeCard';
 import { Episode } from '@/types';
 import { router } from 'expo-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { selectEpisode } from '@/store/slices/episodeSlice';
 
 export const EpisodeList = ({ data }: { data: Episode[] }) => {
+  
+ const dispatch = useDispatch();
+  const episodes = useSelector((state: RootState) => state.episodes.byPodcast);
+
   const handleTrackSelect = (episode: Episode) => {
-    router.push({
-      pathname: '/player',
-      params: {
-        id: episode.id,
-        title: episode.title,
-        description: episode.description,
-        podcast: episode.podcast.title,
-        podcastId: episode.podcastId,
-        artwork: episode.coverImageUrl,
-        videoUrl: episode.videoUrl!,
-        transcriptionUrls: JSON.stringify(episode.transcriptionUrls),
-      },
-    });
+    dispatch(selectEpisode(episode));
+      router.push({
+        pathname: '/player',
+      
+      });
   };
 
   return (

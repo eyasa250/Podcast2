@@ -2,7 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-export function PodcastActions({ isOwner, onAddEpisode, onSubscribe, subscribing, isSubscribed, subscriberCount }: any) {
+export function PodcastActions({ isOwner, onAddEpisode, onSubscribe, subscribing, isSubscribed, subscriberCount , onEditPodcast}: any) {
   return (
     <View style={styles.buttonRow}>
       <TouchableOpacity style={styles.iconButton}>
@@ -13,9 +13,15 @@ export function PodcastActions({ isOwner, onAddEpisode, onSubscribe, subscribing
       </TouchableOpacity>
 
       {isOwner ? (
-        <TouchableOpacity style={styles.iconButton} onPress={onAddEpisode}>
-          <Feather name="plus" size={24} color="white" />
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity style={styles.iconButton} onPress={onAddEpisode}>
+            <Feather name="plus" size={24} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconButton} onPress={onEditPodcast}>
+            <Feather name="edit-2" size={24} color="white" />
+          </TouchableOpacity>
+        </>
       ) : (
         <TouchableOpacity style={styles.iconButton} onPress={onSubscribe} disabled={subscribing}>
           <Feather name={isSubscribed ? "user-check" : "user-plus"} size={24} color="white" />

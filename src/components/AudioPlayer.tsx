@@ -1,25 +1,33 @@
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import { useActiveTrack } from 'react-native-track-player';
-import { unknownTrackImageUri } from '@/constants/images';
-import { MovingText } from './MovingText';
-import { PlayerProgressBar } from './PlayerProgressbar';
 import { PlayerControls } from './PlayerControls';
+import Constants from 'expo-constants';
+import { PlayerProgressBar } from './PlayerProgressbar';
+
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 export const AudioPlayer = () => {
   const activeTrack = useActiveTrack();
 
   if (!activeTrack) return null;
 
+  const artworkUri = activeTrack.artwork?.startsWith('http')
+    ? activeTrack.artwork
+    : `${BASE_URL}${activeTrack.artwork}`;
+
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: activeTrack.artwork || unknownTrackImageUri }}
-        style={styles.artwork}
-      />
-      <MovingText text={activeTrack.title} />
+      <Image source={{ uri: artworkUri }} style={styles.coverImage} />
+      <Text numberOfLines={1} style={styles.title}>{activeTrack.title}</Text>
       {activeTrack.artist && <Text style={styles.artist}>{activeTrack.artist}</Text>}
-      <PlayerProgressBar />
-      <PlayerControls style={styles.controls} />
+      
+      <View style={styles.progressContainer}>
+        <PlayerProgressBar />
+      </View>
+
+      <View style={styles.controlsContainer}>
+        <PlayerControls />
+      </View>
     </View>
   );
 };
@@ -27,22 +35,32 @@ export const AudioPlayer = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginTop: 20,
-    paddingHorizontal: 20,
+    padding: 24,
   },
-  artwork: {
-    width: 250,
-    height: 250,
+  coverImage: {
+    width: 240,
+    height: 240,
     borderRadius: 12,
     marginBottom: 20,
   },
-  artist: {
-    fontSize: 16,
+  title: {
     color: 'white',
-    marginTop: 4,
-    marginBottom: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'center',
   },
-  controls: {
-    marginTop: 24,
+  artist: {
+    color: '#aaa',
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  progressContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  controlsContainer: {
+    width: '100%',
   },
 });
