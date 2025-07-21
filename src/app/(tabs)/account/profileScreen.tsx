@@ -1,20 +1,44 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { PodcastGrid } from "@/components/PodcastGrid";
+import { EpisodeList } from "@/components/EpisodeList";
+import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
+import { signOut } from "@/store/slices/authSlice";
 import { usePodcasts } from "@/hooks/usePodcasts";
-import ProfileOptionList from "@/components/ProfileOptionList";
+import { fetchSubscriptions, setSelectedPodcastId } from "@/store/slices/podcastSlice";
+import { fetchFavoriteEpisodes } from "@/store/slices/episodeSlice";
+import { useView } from "@/hooks/useView";
 import PremiumCard from "@/components/PremiumCard";
 import ChatBubble from "@/components/ChatBubble";
 import theme, { fontSize } from "@/core/theme";
-import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { signOut } from "@/store/slices/authSlice";
 
 const ProfileScreen = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { podcasts } = usePodcasts({ own: true });
+
+  const { subscriptions } = useAppSelector((state) => state.podcasts);
+  const favorites = useAppSelector((state) => state.episodes.favorites);
+  const { history } = useView();
+
+  const [historyEpisodes, setHistoryEpisodes] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchSubscriptions());
+    dispatch(fetchFavoriteEpisodes());
+
+    const loadHistory = async () => {
+      setLoadingHistory(true);
+      const data = await history();
+      setHistoryEpisodes(data);
+      setLoadingHistory(false);
+    };
+    loadHistory();
+  }, []);
 
   if (!user) return <Text style={styles.loading}>Chargement...</Text>;
 
@@ -23,11 +47,11 @@ const ProfileScreen = () => {
   return (
     <>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
+        {/* Header utilisateur */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.settingsButton} onPress={() => dispatch(signOut())}>
             <Ionicons name="log-out-outline" size={24} color="white" />
           </TouchableOpacity>
-
           <Text style={styles.name}>{user.name}</Text>
           <Text style={styles.role}>{user.role}</Text>
 
@@ -41,18 +65,45 @@ const ProfileScreen = () => {
           </View>
         </View>
 
-        <ProfileOptionList />
+        {/* Section : Mes podcasts */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Mes Podcasts</Text>
+          <PodcastGrid data={dataWithAddNew} />
+        </View>
+
+        {/* Section : Mes abonnements */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Mes Abonnements</Text>
+          <PodcastGrid data={subscriptions} />
+        </View>
+
+        {/* Section : Mes favoris */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Mes Favoris</Text>
+          <EpisodeList data={favorites} />
+        </View>
+
+        {/* Section : Historique */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Historique</Text>
+          {loadingHistory ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <EpisodeList data={historyEpisodes} />
+          )}
+        </View>
+
         {user.role !== "PODCASTER" && <PremiumCard />}
       </ScrollView>
 
       {user.role === "PODCASTER" && <ChatBubble />}
     </>
-  )
-;
+  );
 };
+
 const styles = StyleSheet.create({
   container: {
-    flex: 2,
+    flex: 1,
     backgroundColor: theme.colors.background,
   },
   loading: {
@@ -69,36 +120,19 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
-  logoutSection: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  logoutButton: {
-    backgroundColor: '#FF5722',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  name: {
-    fontSize: 22,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-    settingsButton: {
+  settingsButton: {
     position: 'absolute',
     top: 15,
     right: 15,
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
-    },
+  },
+  name: {
+    fontSize: 22,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   role: {
     color: '#e0e0e0',
     marginBottom: 10,

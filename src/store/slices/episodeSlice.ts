@@ -5,6 +5,8 @@ import {
   getEpisodesByPodcastId,
   uploadEpisode,
   getEpisodById,
+  enhanceEpisodeSound,
+  generateSubtitles,
 } from "@/services/episodeApi";
 import {
   getUserFavorites,
@@ -86,6 +88,31 @@ export const addEpisode = createAsyncThunk(
     return await uploadEpisode(podcastId, formData);
   }
 );
+// 🎬 Générer les sous-titres d’un épisode
+export const generateEpisodeSubtitles = createAsyncThunk(
+  "episodes/generateSubtitles",
+  async (episodeId: number, thunkAPI) => {
+    try {
+      const updatedEpisode = await generateSubtitles(episodeId);
+      return updatedEpisode;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors de la génération des sous-titres");
+    }
+  }
+);
+
+// 🔊 Améliorer le son d’un épisode
+export const enhanceEpisodeAudio = createAsyncThunk(
+  "episodes/enhanceAudio",
+  async (episodeId: number, thunkAPI) => {
+    try {
+      const updatedEpisode = await enhanceEpisodeSound(episodeId);
+      return updatedEpisode;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors de l'amélioration du son");
+    }
+  }
+);
 
 const episodesSlice = createSlice({
   name: "episodes",
@@ -131,6 +158,44 @@ const episodesSlice = createSlice({
       .addCase(addEpisode.fulfilled, (state, action) => {
         state.byPodcast.unshift(action.payload);
       });
+          // Sous-titres
+    builder
+      .addCase(generateEpisodeSubtitles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateEpisodeSubtitles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selected = action.payload;
+        const index = state.byPodcast.findIndex(e => e.id === action.payload.id);
+        if (index !== -1) {
+          state.byPodcast[index] = action.payload;
+        }
+      })
+      .addCase(generateEpisodeSubtitles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // Amélioration audio
+    builder
+      .addCase(enhanceEpisodeAudio.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(enhanceEpisodeAudio.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selected = action.payload;
+        const index = state.byPodcast.findIndex(e => e.id === action.payload.id);
+        if (index !== -1) {
+          state.byPodcast[index] = action.payload;
+        }
+      })
+      .addCase(enhanceEpisodeAudio.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
   },
 });
 

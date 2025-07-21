@@ -41,6 +41,34 @@ export const getEpisodById = async (id: number) => {
   }
 };
 
+export const generateSubtitles = async (episodeId: number) => {
+  try {
+    const response = await api.patch(`/episodes/${episodeId}/subtitles`);
+    console.log("✅ Sous-titres générés :", response.data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error("❌ Erreur génération sous-titres :", error.response.data);
+    } else {
+      console.error("❌ Erreur réseau :", error.message);
+    }
+    throw error;
+  }
+};
+export const enhanceEpisodeSound = async (episodeId: number) => {
+  try {
+    const response = await api.patch(`/episodes/${episodeId}/enhance`);
+    console.log("✅ Son amélioré :", response.data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error("❌ Erreur amélioration du son :", error.response.data);
+    } else {
+      console.error("❌ Erreur réseau :", error.message);
+    }
+    throw error;
+  }
+};
 
 
 export const getEpisodesByPodcastId = async (podcastId: string | number) => {

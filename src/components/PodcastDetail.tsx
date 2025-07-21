@@ -91,10 +91,12 @@ const handleEditPodcast = () => {
       }
       renderItem={({ item }) => (
         <View style={{ marginBottom: 8, paddingHorizontal: 16 }}>
-          <EpisodeCard
-            episode={item}
-            onPress={() => handleTrackSelect(item)}
-          />
+        <EpisodeCard
+          episode={item}
+          onPress={() => handleTrackSelect(item)}
+        
+        />
+
         </View>
       )}
       contentContainerStyle={{ paddingBottom: 80 }}
