@@ -6,7 +6,8 @@ import { createPodcast, getPodcastById, updatePodcast } from "@/services/podcast
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { addPodcast, editPodcast } from "@/store/slices/podcastSlice";
+import { addPodcast, editPodcast  } from "@/store/slices/podcastSlice";
+import { resetEditPodcast } from "@/store/slices/editPodcastSlice";
 
 export default function PodcastFormScreenScreen() {
     const router = useRouter();
@@ -18,8 +19,7 @@ export default function PodcastFormScreenScreen() {
 
 const dispatch = useAppDispatch();
 const { mode, podcastId } = useAppSelector((state) => state.editPodcast);
-console.log("🧠 Mode reçu:", mode);
-console.log("🧠 PodcastId reçu:", podcastId);
+
 useEffect(() => {
   const loadPodcast = async () => {
     if (mode  && podcastId != null) {
@@ -34,8 +34,10 @@ useEffect(() => {
         console.error("❌ Erreur lors du chargement du podcast:", error);
       }
     } else {
-      console.log("⚠️ Pas en mode édition ou id null");
-    }
+     setTitle("");
+      setDescription("");
+      setCategory("");
+      setImage("");    }
   };
 
   loadPodcast();
@@ -81,7 +83,8 @@ const handleCreate = async () => {
     } else {
       await dispatch(addPodcast(formData));
       Alert.alert("Created!", "Podcast created successfully.");
-    }
+    }dispatch(resetEditPodcast());
+
     router.back();
   } catch (error: any) {
     Alert.alert("Error", error?.response?.data?.message || "An error occurred.");

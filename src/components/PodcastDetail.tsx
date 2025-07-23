@@ -79,7 +79,7 @@ const handleEditPodcast = () => {
           <PodcastActions
             isOwner={podcast.userId === user?.id}
             onAddEpisode={() =>
-              router.push(`/podcast/createEpisode?id=${selectedId}`)
+              router.push(`/podcast/createEpsiode?id=${selectedId}`)
             }
             onEditPodcast={handleEditPodcast} // ✅ nouveau
             onSubscribe={handleSubscribePress}

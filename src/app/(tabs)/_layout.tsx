@@ -66,13 +66,7 @@ const TabsNavigation = () => {
             tabBarIcon: ({ color }) => <Ionicons name="search" size={24} color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="library"
-          options={{
-            title: "library",
-            tabBarIcon: ({ color }) => <FontAwesome6 name="bookmark" size={28} color={color} />,
-          }}
-        />
+     
         <Tabs.Screen
           name="account"
           options={{

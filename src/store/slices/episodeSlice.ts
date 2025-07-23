@@ -7,6 +7,7 @@ import {
   getEpisodById,
   enhanceEpisodeSound,
   generateSubtitles,
+  updateEpisode,
 } from "@/services/episodeApi";
 import {
   getUserFavorites,
@@ -45,7 +46,7 @@ export const fetchFavoriteEpisodes = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const data = await getUserFavorites();
-      console.log("✅ Episodes favorites dans Redux :", data);
+      // console.log("✅ Episodes favorites dans Redux :", data);
       return data;
     } catch (error) {
       console.error("❌ Erreur dans fetchFavoriteEpisodes:", error);
@@ -88,6 +89,15 @@ export const addEpisode = createAsyncThunk(
     return await uploadEpisode(podcastId, formData);
   }
 );
+export const editEpisode = createAsyncThunk(
+  'episodes/updateEpisode',
+  async ({ id, data }: { id: string; data: FormData }) => {
+    
+        return await updateEpisode(id, data);
+    
+  }
+);
+
 // 🎬 Générer les sous-titres d’un épisode
 export const generateEpisodeSubtitles = createAsyncThunk(
   "episodes/generateSubtitles",

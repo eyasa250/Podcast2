@@ -28,8 +28,6 @@ export function PodcastActions({ isOwner, onAddEpisode, onSubscribe, subscribing
         </TouchableOpacity>
       )}
 
-      {/* Afficher le nombre d'abonnés */}
-      <Text style={styles.subscriberCount}>{subscriberCount ?? 0} abonnés</Text>
     </View>
   );
 }

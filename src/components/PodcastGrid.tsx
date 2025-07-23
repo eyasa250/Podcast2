@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View, StyleSheet, Text, Dimensions, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { PodcastGridItem } from "./PodcastGridItem";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Podcast } from "@/types";
 import { useDispatch } from "react-redux";
 import { setSelectedPodcastId } from "@/store/slices/podcastSlice";
@@ -67,6 +67,7 @@ const handlePress = (podcast: Podcast) => {
       renderItem={renderItem}
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
+          <MaterialIcons name="podcasts" size={50} color="#555" />
           <Text style={styles.emptyText}>No Podcasts found</Text>
         </View>
       }

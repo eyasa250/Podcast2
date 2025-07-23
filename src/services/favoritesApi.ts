@@ -30,7 +30,7 @@ export const removeFavorite = async (episodeId: number) => {
 export const getUserFavorites = async () => {
   const headers = await getAuthHeaders();
   const response = await api.get(`/favorites/user/`, headers);
-    console.log("📥 Données reçues de l'API /favorites:", response.data); // 👈 log ici
+    // console.log("📥 Données reçues de l'API /favorites:", response.data); // 👈 log ici
 
   return response.data;
 };

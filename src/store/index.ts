@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "@/store/slices/authSlice";
 import podcastReducer from "./slices/podcastSlice";
-import episodeReducer from './slices/episodeSlice';
+import episodeReducer, { editEpisode } from './slices/episodeSlice';
 import editPodcastReducer from "./slices/editPodcastSlice";
+import editEpisodeReducer from "./slices/editEpisodeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     podcasts: podcastReducer,
     episodes: episodeReducer,
     editPodcast: editPodcastReducer,
+    editEpisode: editEpisodeReducer,
 
 
   },

@@ -40,6 +40,15 @@ export const getEpisodById = async (id: number) => {
     throw error;
   }
 };
+export const updateEpisode = async (id: string, data: FormData) => {
+  const response = await api.patch(`/episodes/${id}/edit`, data, {
+    headers: {
+      // Ne pas fixer Content-Type à 'application/json'
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
 
 export const generateSubtitles = async (episodeId: number) => {
   try {

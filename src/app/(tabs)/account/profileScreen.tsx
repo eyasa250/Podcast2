@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import { PodcastGrid } from "@/components/PodcastGrid";
 import { EpisodeList } from "@/components/EpisodeList";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { signOut } from "@/store/slices/authSlice";
-import { usePodcasts } from "@/hooks/usePodcasts";
-import { fetchSubscriptions, setSelectedPodcastId } from "@/store/slices/podcastSlice";
+import { fetchSubscriptions, setSelectedPodcastId,fetchMyPodcasts } from "@/store/slices/podcastSlice";
 import { fetchFavoriteEpisodes } from "@/store/slices/episodeSlice";
 import { useView } from "@/hooks/useView";
 import PremiumCard from "@/components/PremiumCard";
 import ChatBubble from "@/components/ChatBubble";
 import theme, { fontSize } from "@/core/theme";
+import { router } from "expo-router";
 
 const ProfileScreen = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { podcasts } = usePodcasts({ own: true });
 
   const { subscriptions } = useAppSelector((state) => state.podcasts);
+    const { mine } = useAppSelector((state) => state.podcasts);
+
   const favorites = useAppSelector((state) => state.episodes.favorites);
   const { history } = useView();
 
@@ -28,6 +29,7 @@ const ProfileScreen = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
+    dispatch(fetchMyPodcasts());
     dispatch(fetchSubscriptions());
     dispatch(fetchFavoriteEpisodes());
 
@@ -42,7 +44,7 @@ const ProfileScreen = () => {
 
   if (!user) return <Text style={styles.loading}>Chargement...</Text>;
 
-  const dataWithAddNew = [...podcasts, { id: "add-new", isAddNew: true }];
+  const dataWithAddNew = [...mine, { id: "add-new", isAddNew: true }];
 
   return (
     <>
@@ -67,19 +69,26 @@ const ProfileScreen = () => {
 
         {/* Section : Mes podcasts */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mes Podcasts</Text>
-          <PodcastGrid data={dataWithAddNew} />
+          <Text style={styles.sectionTitle}>My Podcasts</Text>
+         <PodcastGrid data={dataWithAddNew}  onAddPress={() =>  router.push("/podcast/PodcastFormScreen")
+         }
+ />
         </View>
-
+ 
         {/* Section : Mes abonnements */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mes Abonnements</Text>
-          <PodcastGrid data={subscriptions} />
+          <Text style={styles.sectionTitle}>My following</Text>
+         {subscriptions?(<PodcastGrid data={subscriptions} />)
+         :(
+           <MaterialIcons name="podcasts" size={50} color="#555" />
+
+         )}
+          
         </View>
 
         {/* Section : Mes favoris */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mes Favoris</Text>
+          <Text style={styles.sectionTitle}>Liked episodes</Text>
           <EpisodeList data={favorites} />
         </View>
 
