@@ -14,6 +14,7 @@ import {
   addFavorite,
   removeFavorite,
 } from "@/services/favoritesApi";
+import { addView, getTotalEpisodeViews } from "@/services/viewApi";
 
 type EpisodesState = {
   byPodcast: Episode[];
@@ -21,6 +22,8 @@ type EpisodesState = {
   selected: Episode | null;
   loading: boolean;
   error: string | null;
+    viewsByEpisodeId: { [episodeId: number]: number }; // 👈 Ajouter ici
+
 };
 
 const initialState: EpisodesState = {
@@ -29,6 +32,8 @@ const initialState: EpisodesState = {
   selected: null,
   loading: false,
   error: null,
+  viewsByEpisodeId: {},
+
 };
 
 // 🔁 Récupérer les épisodes d’un podcast
@@ -123,6 +128,26 @@ export const enhanceEpisodeAudio = createAsyncThunk(
     }
   }
 );
+export const fetchEpisodeViews = createAsyncThunk(
+  "episodes/fetchViews",
+  async (episodeId: number, thunkAPI) => {
+    try {
+      const data = await getTotalEpisodeViews(episodeId);
+return { episodeId, views: typeof data === 'number' ? data : data.totalViews };
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors du chargement des vues");
+    }
+  }
+);
+export const addEpisodeView = createAsyncThunk(
+  "episodes/addView",
+  async (episodeId: number, { dispatch }) => {
+        console.log("📡 Envoi de la vue pour l'épisode", episodeId);
+
+    await addView(episodeId);
+    dispatch(fetchEpisodeViews(episodeId)); // Rafraîchir les vues
+  }
+);
 
 const episodesSlice = createSlice({
   name: "episodes",
@@ -156,6 +181,7 @@ const episodesSlice = createSlice({
 
     builder
       .addCase(fetchFavoriteEpisodes.fulfilled, (state, action) => {
+            console.log("✅ Favoris mis à jour :", action.payload.map((e: { id: any; }) => e.id));
         state.favorites = action.payload;
       });
 
@@ -205,6 +231,15 @@ const episodesSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
+builder
+  .addCase(fetchEpisodeViews.fulfilled, (state, action) => {
+    const { episodeId, views } = action.payload;
+    state.viewsByEpisodeId[episodeId] = views;
+  });
+builder
+  .addCase(fetchEpisodeViews.rejected, (state, action) => {
+    state.error = action.payload as string;
+  });
 
   },
 });

@@ -24,6 +24,9 @@ import Constants from "expo-constants";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import TrackPlayer from "react-native-track-player";
 import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
+import { addEpisodeView } from "@/store/slices/episodeSlice";
 
 interface SubtitleTrack {
   title: string;
@@ -39,7 +42,6 @@ const PlayerScreen = () => {
   const { top, bottom } = useSafeAreaInsets();
   const modalRef = useRef<Modalize>(null);
   const activeTrack = useActiveTrack();
-  const { TotalEpisodesViews, newView } = useView();
 
   // --- Récupération de l'épisode sélectionné dans le store Redux ---
   const episode = useSelector((state: RootState) => state.episodes.selected);
@@ -53,9 +55,19 @@ const PlayerScreen = () => {
     );
   }
 
-  // --- State pour le nombre de vues de l’épisode ---
-  const [episodeViews, setEpisodeViews] = useState<number>(0);
-  const hasFetchedViews = useRef(false);
+
+const dispatch = useDispatch<AppDispatch>();
+const episodeViews = useSelector((state: RootState) => {
+  const views = state.episodes.viewsByEpisodeId[episode.id] || 0;
+  console.log("📊 Vues actuelles pour l'épisode", episode.id, ":", views);
+  return views;
+});
+
+useEffect(() => {
+    console.log("👁️ Ajout d'une nouvelle vue pour l'épisode", episode.id);
+
+  dispatch(addEpisodeView(episode.id));
+}, [dispatch, episode.id]);
 
   // --- Détection du type média : audio ou vidéo ---
   const isAudio = !!episode.audioUrl;
@@ -83,23 +95,7 @@ const PlayerScreen = () => {
     })
   );
 
-  // --- Effet pour récupérer et afficher le nombre de vues ---
-  useEffect(() => {
-    if (hasFetchedViews.current) return;
 
-    const fetchViews = async () => {
-      await newView(episode.id);
-      const total = await TotalEpisodesViews(episode.id);
-      if (typeof total === "number") {
-        setEpisodeViews(total);
-      } else if (total?.total) {
-        setEpisodeViews(total.total);
-      }
-      hasFetchedViews.current = true;
-    };
-
-    fetchViews();
-  }, [episode.id, newView, TotalEpisodesViews]);
 
   // --- Initialisation du player audio ---
   useSetupTrackPlayer();

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, View, FlatList } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscriberCount } from "@/hooks/useSubscriberCount";
@@ -9,8 +9,9 @@ import { router } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Episode } from "@/types";
-import { selectEpisode } from "@/store/slices/episodeSlice";
+import { fetchFavoriteEpisodes, selectEpisode } from "@/store/slices/episodeSlice";
 import { setEditPodcast } from "@/store/slices/editPodcastSlice";
+import { useAppDispatch } from "@/hooks/reduxHooks";
 
 export const PodcastDetail = () => {
   const { user } = useAuth();
@@ -18,9 +19,11 @@ export const PodcastDetail = () => {
   const { selected: podcast, selectedId } = useSelector(
     (state: RootState) => state.podcasts
   );
- const dispatch = useDispatch();
+const dispatch = useAppDispatch(); // ✅
   const episodes = useSelector((state: RootState) => state.episodes.byPodcast);
-
+useEffect(() => {
+  dispatch(fetchFavoriteEpisodes());
+}, []);
   const {
     count,
     isSubscribed,
@@ -79,7 +82,7 @@ const handleEditPodcast = () => {
           <PodcastActions
             isOwner={podcast.userId === user?.id}
             onAddEpisode={() =>
-              router.push(`/podcast/createEpsiode?id=${selectedId}`)
+              router.push(`/podcast/createEpisode?id=${selectedId}`)
             }
             onEditPodcast={handleEditPodcast} // ✅ nouveau
             onSubscribe={handleSubscribePress}

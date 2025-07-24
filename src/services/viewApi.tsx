@@ -10,7 +10,7 @@ export const getTotalPodcastViews = async (podcastId: number) => {
 };
 
 export const addView = async (episodeId: number) => {
-  await api.post(`/view/${episodeId}`, null);
+  await api.post(`/view/add/${episodeId}`, null);
 };
 // services/viewApi.ts
 export const getViewHistory = async () => {
