@@ -18,6 +18,10 @@ export const getViewHistory = async () => {
   return response.data;
 };
 
+export const updateListenedDuration = async (episodeId: number, userId: number, duration: number) => {
+  await api.patch(`/view/update-duration`, { episodeId, userId, listenedDuration: duration });
+};
+
 
 
 export const getTotalEpisodeViews = async (episodeId: number) => {

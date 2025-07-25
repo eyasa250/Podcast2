@@ -27,6 +27,9 @@ import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
 import { addEpisodeView } from "@/store/slices/episodeSlice";
+import { updateListenedDuration } from "@/services/viewApi";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface SubtitleTrack {
   title: string;
@@ -62,6 +65,72 @@ const episodeViews = useSelector((state: RootState) => {
   console.log("📊 Vues actuelles pour l'épisode", episode.id, ":", views);
   return views;
 });
+  const user = useSelector((state: RootState) => state.auth.user); // utilisateur connecté
+  const listeningTimeRef = useRef(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const saveDurationLocally = async (episodeId: number, seconds: number) => {
+  try {
+    await AsyncStorage.setItem(`duration-${episodeId}`, seconds.toString());
+  } catch (e) {
+    console.error("Erreur stockage local :", e);
+  }
+};
+
+const loadDurationLocally = async (episodeId: number) => {
+  try {
+    const value = await AsyncStorage.getItem(`duration-${episodeId}`);
+    return value ? parseInt(value) : 0;
+  } catch (e) {
+    return 0;
+  }
+};
+  useFocusEffect(
+  React.useCallback(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      const listened = listeningTimeRef.current;
+      if (listened > 0) {
+        updateListenedDuration(episode.id, user.id, listened).catch(console.error);
+        console.log("🕒 [FocusEffect] Envoi à la sortie :", listened, "s");
+      }
+    };
+  }, [episode?.id, user?.id])
+);
+useEffect(() => {
+  if (!episode || !user) return;
+  const setup = async () => {
+    const stored = await loadDurationLocally(episode.id);
+    listeningTimeRef.current = stored;
+  };
+
+  setup();
+  // Nettoyage préalable
+   if (intervalRef.current) clearInterval(intervalRef.current);
+
+
+  listeningTimeRef.current = 0;
+
+intervalRef.current = setInterval(() => {
+  listeningTimeRef.current += 1;
+if (listeningTimeRef.current % 10 === 0) {
+      saveDurationLocally(episode.id, listeningTimeRef.current);
+    }
+  if (listeningTimeRef.current % 30 === 0) {
+    updateListenedDuration(episode.id, user.id, listeningTimeRef.current).catch(console.error);
+    console.log("📤 Envoi périodique :", listeningTimeRef.current, "s");
+  }
+}, 1000);
+
+
+  return () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    const listened = listeningTimeRef.current;
+    if (listened > 0) {
+      updateListenedDuration(episode.id, user.id, listened).catch(console.error);
+      console.log(`🕒 Envoi final : ${listened}s`);
+    }
+  };
+}, [episode?.id, user?.id]);
 
 useEffect(() => {
     console.log("👁️ Ajout d'une nouvelle vue pour l'épisode", episode.id);
