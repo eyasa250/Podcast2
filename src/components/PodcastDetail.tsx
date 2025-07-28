@@ -53,7 +53,7 @@ useEffect(() => {
   };
 const handleEditPodcast = () => {
   dispatch(setEditPodcast({ mode: "edit", podcastId: selectedId }));
-  router.push("/podcast/PodcastFormScreen");
+  router.push("/studio/podcast/PodcastFormScreen");
 };
 
   const handleTrackSelect = (episode: Episode) => {

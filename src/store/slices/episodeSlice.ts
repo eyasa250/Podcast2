@@ -181,7 +181,6 @@ const episodesSlice = createSlice({
 
     builder
       .addCase(fetchFavoriteEpisodes.fulfilled, (state, action) => {
-            console.log("✅ Favoris mis à jour :", action.payload.map((e: { id: any; }) => e.id));
         state.favorites = action.payload;
       });
 

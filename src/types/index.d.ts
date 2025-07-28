@@ -54,4 +54,22 @@ export interface Podcast {
 
 }
 
-  
+  export interface PodcasterStats {
+  totalViews: number;
+  totalFavorites: number;
+  totalSubscribers: number;
+  totalEpisodes: number;
+  totalPodcasts: number;
+  completionRate: number; // en %
+  averageDuration: number;
+ totalListenedDuration:number;
+ monthlyViews // en secondes
+}
+export interface PodcastStats {
+  podcastId: number;
+  totalViews: number;
+  averageListenTime: number;
+  favoriteCount: number;
+  completionRate: number;
+  episodeCount: number;
+}

@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import {
   createPodcast,
+  fetchPodcasterStats,
+  fetchstastperPdcast,
   getAllPodcasts,
   getPodcastById,
   getPodcastsByUser,
   updatePodcast,
 } from "@/services/podcastApi";
-import { Podcast } from "@/types";
+import { Podcast, PodcasterStats, PodcastStats } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getMySubscriptions } from "@/services/subscriptionApi";
 
@@ -16,6 +18,8 @@ type PodcastsState = {
   subscriptions: Podcast[];
   selected: Podcast | null;
   selectedId: string | null;
+  stats: PodcasterStats | null;
+  podcastStats: PodcastStats | null;
   loading: boolean;
   error: string | null;
 };
@@ -26,6 +30,8 @@ const initialState: PodcastsState = {
   subscriptions: [],
   selected: null,
   selectedId: null,
+  stats: null,
+  podcastStats: null,
   loading: false,
   error: null,
 };
@@ -42,7 +48,25 @@ export const fetchMyPodcasts = createAsyncThunk("podcasts/fetchMine", async () =
   if (!user || !user.id) throw new Error("Utilisateur non connecté");
   return await getPodcastsByUser(user.id);
 });
+export const fetchStatsForPodcaster = createAsyncThunk(
+  "podcasts/fetchStatsForPodcaster",
+  async (_, thunkAPI) => {
+    try {
+      const stats = await fetchPodcasterStats();
+      return stats;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Erreur inconnue");
+    }
+  }
+);
 
+// 📊 Thunk pour les stats d’un podcast
+export const fetchStatsForPodcast = createAsyncThunk(
+  "podcasts/fetchPodcastStats",
+  async (podcastId: number) => {
+    return await fetchstastperPdcast(podcastId);
+  }
+);
 // 🔁 Détail d’un podcast
 export const fetchPodcastDetails = createAsyncThunk("podcasts/fetchDetails", async (id: string) => {
   return await getPodcastById(Number(id));
@@ -139,6 +163,35 @@ const podcastsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Erreur lors du chargement des abonnements";
       });
+      builder
+ builder
+  .addCase(fetchStatsForPodcaster.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+  .addCase(fetchStatsForPodcaster.fulfilled, (state, action) => {
+    state.loading = false;
+    state.stats = action.payload;
+  })
+  .addCase(fetchStatsForPodcaster.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.error.message || "Erreur stats podcasteur";
+  });
+
+builder
+  .addCase(fetchStatsForPodcast.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+  .addCase(fetchStatsForPodcast.fulfilled, (state, action) => {
+    state.loading = false;
+    state.podcastStats = action.payload;
+  })
+  .addCase(fetchStatsForPodcast.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.error.message || "Erreur stats podcast";
+  });
+
   },
 });
 

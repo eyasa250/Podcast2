@@ -31,7 +31,7 @@ const dispatch = useDispatch();
 
 const handlePress = (podcast: Podcast) => {
   dispatch(setSelectedPodcastId(podcast.id)); // ✅ définit l'ID sélectionné
-  router.push("/podcast/podcastDetailsScreen"); // pas besoin de passer id
+  router.push("/studio/podcast/podcastDetailsScreen"); // pas besoin de passer id
 };
 
   const renderItem = ({ item }: { item: Podcast & { isAddNew?: boolean } }) => {

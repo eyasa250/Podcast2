@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import api from "lib/axios";
+import { PodcasterStats, PodcastStats } from "@/types";
 
 
 
@@ -74,7 +75,14 @@ export const createPodcast = async (formData: FormData) => {
 
   return response.data;
 };
-
-
+export const fetchPodcasterStats = async (): Promise<PodcasterStats> => {
+  const res = await api.get(`/stats/podcaster`);
+  console.log("res:",res)
+  return res.data;
+};
+export const fetchstastperPdcast = async (PodcastId: number): Promise<PodcastStats> => {
+  const res = await api.get(`/stats/podcaster/${PodcastId}/stats`);
+  return res.data;
+};
 
 export default api;

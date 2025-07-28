@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { FontAwesome6, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialCommunityIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { SplashScreen, Tabs } from "expo-router";
 import { FloatingPlayerProvider } from "@/hooks/FloatingPlayerContext";
 import { FloatingPlayer } from "@/components/FloatingPlayer";
@@ -13,15 +13,7 @@ SplashScreen.preventAutoHideAsync();
 
 const TabsNavigation = () => {
   const { user } = useAuth();
-
-  // useLogTrackPlayerState();
-
-  // const handleTrackPlayerLoaded = useCallback(() => {
-  //   SplashScreen.hideAsync();
-  // }, []);
-
-  // useSetupTrackPlayer({ onLoad: handleTrackPlayerLoaded });
-
+  const isPodcaster = user?.role === "PODCASTER";
 
 
   return (
@@ -74,6 +66,7 @@ const TabsNavigation = () => {
             tabBarIcon: ({ color }) => <FontAwesome6 name="crown" size={20} color={color} />
  }}
         />
+      
       </Tabs>
 
       <FloatingPlayer
