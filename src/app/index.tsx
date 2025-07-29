@@ -1,35 +1,24 @@
-/* import React from "react";
-import Background from "@/components/Background";
-import BackButton from "@/components/BackButton";
-import Logo from "@/components/Logo";
-import Header from "@/components/Header";
-import TextInput from "@/components/TextInput";
-import Button from "@/components/Button";
-import Paragraph from "@/components/Paragraph";
-import { useRouter } from "expo-router";
-
-export default function HomeScreen() {
-  const router = useRouter(); // Expo Router pour la navigation
-
-  return (
-    <Background>
-      <Logo />
-      <Header>Welcome to Podcasty</Header>
-  
-      <Button mode="outlined" onPress={() => router.push("/auth/login")}>
-        Log in
-      </Button>
-      <Button mode="outlined" onPress={() => router.push("/auth/register")}>
-        Create an account
-      </Button>
-   
-    </Background>
-  );
-}
- */
-// app/index.tsx
+import React, { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
-  return <Redirect href="/(tabs)/home" />;
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const value = await AsyncStorage.getItem("hasSeenOnboarding");
+      setHasSeenOnboarding(value === "true");
+    };
+
+    checkOnboarding();
+  }, []);
+
+  if (hasSeenOnboarding === null) return null; // ou un splash screen temporaire
+
+  return hasSeenOnboarding ? (
+    <Redirect href="/(tabs)/home" />
+  ) : (
+    <Redirect href="/OnboardingScreen" />
+  );
 }
