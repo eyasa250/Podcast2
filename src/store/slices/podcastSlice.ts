@@ -3,12 +3,13 @@ import {
   createPodcast,
   fetchPodcasterStats,
   fetchstastperPdcast,
+  fetchViewsByCategory,
   getAllPodcasts,
   getPodcastById,
   getPodcastsByUser,
   updatePodcast,
 } from "@/services/podcastApi";
-import { Podcast, PodcasterStats, PodcastStats } from "@/types";
+import { CategoryView, Podcast, PodcasterStats, PodcastStats } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getMySubscriptions } from "@/services/subscriptionApi";
 
@@ -22,6 +23,8 @@ type PodcastsState = {
   podcastStats: PodcastStats | null;
   loading: boolean;
   error: string | null;
+  viewsByCategory: CategoryView[]; // 👈 ici
+
 };
 
 const initialState: PodcastsState = {
@@ -34,6 +37,8 @@ const initialState: PodcastsState = {
   podcastStats: null,
   loading: false,
   error: null,
+  viewsByCategory: [],
+
 };
 
 // 🔁 Récupère tous les podcasts
@@ -89,6 +94,19 @@ export const fetchSubscriptions = createAsyncThunk("podcasts/fetchSubscriptions"
   const res = await getMySubscriptions();
   return res.data;
 });
+export const fetchViewsByCategoryThunk = createAsyncThunk<
+  CategoryView[], // ✅ Type de retour correct ici
+  void,
+  { rejectValue: string }
+>("podcasts/fetchViewsByCategory", async (_, thunkAPI) => {
+  try {
+    const result = await fetchViewsByCategory(); // 👈 ce résultat doit être un tableau [{name: "...", value: ...}]
+    return result;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response?.data?.message || "Erreur views by category");
+  }
+});
+
 
 const podcastsSlice = createSlice({
   name: "podcasts",
@@ -190,6 +208,19 @@ builder
   .addCase(fetchStatsForPodcast.rejected, (state, action) => {
     state.loading = false;
     state.error = action.error.message || "Erreur stats podcast";
+  });
+builder
+  .addCase(fetchViewsByCategoryThunk.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+  .addCase(fetchViewsByCategoryThunk.fulfilled, (state, action) => {
+    state.loading = false;
+    state.viewsByCategory = action.payload;
+  })
+  .addCase(fetchViewsByCategoryThunk.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.payload as string;
   });
 
   },

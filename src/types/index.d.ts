@@ -73,3 +73,7 @@ export interface PodcastStats {
   completionRate: number;
   episodeCount: number;
 }
+interface CategoryView {
+  name: string;
+  value: number;
+}

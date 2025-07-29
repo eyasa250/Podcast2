@@ -1,19 +1,26 @@
 import React, { useEffect } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { fetchStatsForPodcaster } from "@/store/slices/podcastSlice";
+import { fetchStatsForPodcaster, fetchViewsByCategoryThunk } from "@/store/slices/podcastSlice";
 import { StatCard } from "@/components/StatCard";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import { PieChartComponent } from "@/components/PieChartComponent";
 
 const StatsScreen = () => {
   const dispatch = useAppDispatch();
-  const { stats, loading, error } = useAppSelector((state) => state.podcasts);
+  const { stats, loading, error ,viewsByCategory } = useAppSelector((state) => state.podcasts);
 
 useEffect(() => {
   dispatch(fetchStatsForPodcaster());
   
 }, []);
+
+  useEffect(() => {
+    dispatch(fetchViewsByCategoryThunk());
+  }, []);
+
+
 // useEffect(() => {
 //   dispatch(fetchStatsForPodcast(podcastId));
 // }, [podcastId]);
@@ -96,6 +103,14 @@ useEffect(() => {
     Pas encore de données d'écoute.
   </Text>
 )}
+ {viewsByCategory && viewsByCategory.length > 0 ? (
+  <PieChartComponent data={viewsByCategory} />
+) : (
+  <Text style={{ textAlign: "center", color: "#888", marginVertical: 12 }}>
+    Pas encore de données de répartition par catégorie.
+  </Text>
+)} 
+
     </ScrollView>
   );
 };
