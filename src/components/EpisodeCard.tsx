@@ -70,7 +70,7 @@ const toggleFavorite = () => {
 
   const handleEditEpisodes = () => {
     dispatch(setEditEpisode(episode));
-    router.push("/podcast/EditEpisodeScreen");
+    router.push("/studio/episode/EditEpisodeScreen");
   };
 
   const handleGenerateSubtitles = () => {

@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -273,7 +273,7 @@ modalOverlay: {
 },
 
 menuContainer: {
-  backgroundColor: '#fff',
+  backgroundColor: theme.colors.background,
   borderRadius: 8,
   paddingVertical: 10,
   width: 180,

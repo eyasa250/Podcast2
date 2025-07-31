@@ -1,3 +1,4 @@
+import theme from '@/core/theme';
 import {  useRouter } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
@@ -16,7 +17,7 @@ const OnboardingScreen = ({ navigation }: any) => {
     <Swiper
       loop={false}
       showsPagination={true}
-      activeDotColor="#4f46e5"
+      activeDotColor={theme.colors.secondary}
     >
       {/* Slide 1 */}
       <View style={styles.slide}>
@@ -62,7 +63,7 @@ export default OnboardingScreen;
 const styles = StyleSheet.create({
   slide: {
     flex: 1,
-    backgroundColor: '#eef2ff',
+    backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 30,
-    backgroundColor: '#4f46e5',
+    backgroundColor: theme.colors.secondary,
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 25,

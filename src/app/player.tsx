@@ -30,6 +30,7 @@ import { addEpisodeView } from "@/store/slices/episodeSlice";
 import { updateListenedDuration } from "@/services/viewApi";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import theme from "@/core/theme";
 
 interface SubtitleTrack {
   title: string;
@@ -62,7 +63,6 @@ const PlayerScreen = () => {
 const dispatch = useDispatch<AppDispatch>();
 const episodeViews = useSelector((state: RootState) => {
   const views = state.episodes.viewsByEpisodeId[episode.id] || 0;
-  console.log("📊 Vues actuelles pour l'épisode", episode.id, ":", views);
   return views;
 });
   const user = useSelector((state: RootState) => state.auth.user); // utilisateur connecté
@@ -91,7 +91,6 @@ const loadDurationLocally = async (episodeId: number) => {
       const listened = listeningTimeRef.current;
       if (listened > 0) {
         updateListenedDuration(episode.id, user.id, listened).catch(console.error);
-        console.log("🕒 [FocusEffect] Envoi à la sortie :", listened, "s");
       }
     };
   }, [episode?.id, user?.id])
@@ -117,7 +116,6 @@ if (listeningTimeRef.current % 10 === 0) {
     }
   if (listeningTimeRef.current % 30 === 0) {
     updateListenedDuration(episode.id, user.id, listeningTimeRef.current).catch(console.error);
-    console.log("📤 Envoi périodique :", listeningTimeRef.current, "s");
   }
 }, 1000);
 
@@ -127,13 +125,11 @@ if (listeningTimeRef.current % 10 === 0) {
     const listened = listeningTimeRef.current;
     if (listened > 0) {
       updateListenedDuration(episode.id, user.id, listened).catch(console.error);
-      console.log(`🕒 Envoi final : ${listened}s`);
     }
   };
 }, [episode?.id, user?.id]);
 
 useEffect(() => {
-    console.log("👁️ Ajout d'une nouvelle vue pour l'épisode", episode.id);
 
   dispatch(addEpisodeView(episode.id));
 }, [dispatch, episode.id]);
@@ -170,40 +166,51 @@ useEffect(() => {
   useSetupTrackPlayer();
 
   // --- Effet pour gérer le chargement et la lecture audio ---
-  useEffect(() => {
-    let isMounted = true;
+useEffect(() => {
+  let isMounted = true;
 
-    console.log('Audio URL:', audioSourceUrl);
-
-    const setupAudio = async () => {
-      try {
-        if (isAudio && audioSourceUrl && isMounted) {
-          await TrackPlayer.reset();
-          await TrackPlayer.add({
-            id: episode.id.toString(),
-            url: audioSourceUrl,
-            title: episode.title,
-            artist:
-              typeof episode.podcast === "string"
-                ? episode.podcast
-                : episode.podcast?.title || "Inconnu",
-            artwork: coverSourceUrl,
-          });
-          await TrackPlayer.play();
-        } else if (!isAudio) {
-          await TrackPlayer.pause(); // Stop playback if it's not audio
+  const setupAudio = async () => {
+    try {
+      if (isAudio && audioSourceUrl && isMounted) {
+        const currentTrackId = await TrackPlayer.getCurrentTrack();
+       console.log("Current track ID:", currentTrackId, "Episode ID:", episode.id);
+ 
+        // Si la track actuelle est déjà celle de l'épisode, ne rien faire
+        if (currentTrackId?.toString() === episode.id.toString()) {
+          return;
         }
-      } catch (error) {
-        console.error("Erreur TrackPlayer:", error);
+
+        await TrackPlayer.reset();
+        await TrackPlayer.add({
+          id: episode.id.toString(),
+          url: audioSourceUrl,
+          title: episode.title,
+          artist:
+            typeof episode.podcast === "string"
+              ? episode.podcast
+              : episode.podcast?.title || "Inconnu",
+          artwork: coverSourceUrl,
+        });const stored = await loadDurationLocally(episode.id);
+if (stored > 5) {
+  await TrackPlayer.seekTo(stored);
+}
+
+        await TrackPlayer.play();
+      } else if (!isAudio) {
+        await TrackPlayer.pause();
       }
-    };
+    } catch (error) {
+      console.error("Erreur TrackPlayer:", error);
+    }
+  };
 
-    setupAudio();
+  setupAudio();
 
-    return () => {
-      isMounted = false;
-    };
-  }, [episode, isAudio]);
+  return () => {
+    isMounted = false;
+  };
+}, [episode, isAudio]);
+
 
   // --- Fonction pour ouvrir le modal d’options du track ---
   const openModal = () => {
@@ -334,7 +341,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#000",
+    backgroundColor: theme.colors.background,
   },
 });
 

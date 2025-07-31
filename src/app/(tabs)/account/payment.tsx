@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert 
 import { Stack, router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { upgradeRole } from "@/store/slices/authSlice";
+import theme from "@/core/theme";
 
 
 export default function PaymentScreen() {
@@ -79,7 +80,7 @@ export default function PaymentScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F6FC",
+    backgroundColor: theme.colors.background,
     padding: 20,
   },
   header: {
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     color: "#1A237E",
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     padding: 20,
     borderRadius: 15,
     shadowColor: "#000",
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
-    backgroundColor: "#F9F9F9",
+    backgroundColor: theme.colors.background,
   },
   row: {
     flexDirection: "row",
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     width: "48%",
   },
   button: {
-    backgroundColor: "#6200EE", // Couleur bleu/violet moderne
+    backgroundColor:theme.colors.secondary, // Couleur bleu/violet moderne
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: "center",

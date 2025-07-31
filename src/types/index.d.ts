@@ -14,6 +14,11 @@ export interface EpisodeFormData  {
   mediaFile: any;
   imageFile?: any;
 };
+export interface User{
+  id: number;
+  name: string;
+  email: string;
+}
 interface Episode {
   id: number;
   title: string;
@@ -49,8 +54,8 @@ export interface Podcast {
   category: string
   author: string;
   image: Image;
-  userId: number,
-  imageFile?: any;
+  user: User,
+  coverImageUrl: string;
 
 }
 

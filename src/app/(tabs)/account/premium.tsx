@@ -1,3 +1,4 @@
+import theme from "@/core/theme";
 import { router, useNavigation } from "expo-router";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f4f4f4",
+    backgroundColor: theme.colors.background,
     padding: 20,
   },
   image: {

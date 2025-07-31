@@ -2,17 +2,24 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Podcast } from '@/types';
 import { unknownTrackImageUri } from '@/constants/images';
+import Constants from 'expo-constants';
 
 type Props = {
   podcast: Podcast;
   onPress: (podcast: Podcast) => void;
 };
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl
+
 
 export const PodcastGridItem = ({ podcast, onPress }: Props) => {
+  const artworkUri = podcast.coverImageUrl?.startsWith("http")
+    ? podcast.coverImageUrl
+    : `${BASE_URL}${podcast.coverImageUrl}`;;
+
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(podcast)}>
       <Image
-        source={{ uri: podcast.image ?? unknownTrackImageUri }}
+        source={{ uri: artworkUri }}
         style={styles.image}
       />
       <Text style={styles.title} numberOfLines={2}>{podcast.title}</Text>

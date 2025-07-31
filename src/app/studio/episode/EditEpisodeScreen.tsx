@@ -18,6 +18,7 @@ import { Audio } from "expo-av";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "react-native";
+import theme from "@/core/theme";
 
 export default function EditEpisodeScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   button: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: theme.colors.secondary,
     padding: 14,
     borderRadius: 10,
     marginTop: 24,

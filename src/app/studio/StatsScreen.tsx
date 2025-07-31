@@ -6,6 +6,7 @@ import { StatCard } from "@/components/StatCard";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { PieChartComponent } from "@/components/PieChartComponent";
+import theme from "@/core/theme";
 
 const StatsScreen = () => {
   const dispatch = useAppDispatch();
@@ -76,7 +77,7 @@ useEffect(() => {
   yAxisLabel=""
   fromZero={true}
   chartConfig={{
-    backgroundColor: "#fff",
+    backgroundColor:theme.colors.background,
     backgroundGradientFrom: "#fff",
     backgroundGradientTo: "#fff",
     decimalPlaces: 0,

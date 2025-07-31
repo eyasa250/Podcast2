@@ -12,15 +12,18 @@ import { Episode } from "@/types";
 import { fetchFavoriteEpisodes, selectEpisode } from "@/store/slices/episodeSlice";
 import { setEditPodcast } from "@/store/slices/editPodcastSlice";
 import { useAppDispatch } from "@/hooks/reduxHooks";
+import { fetchStatsForPodcast } from "@/store/slices/podcastSlice";
 
 export const PodcastDetail = () => {
   const { user } = useAuth();
-
-  const { selected: podcast, selectedId } = useSelector(
-    (state: RootState) => state.podcasts
-  );
 const dispatch = useAppDispatch(); // ✅
+
+ const { selected: podcast, selectedId, statsByPodcast } = useSelector(
+  (state: RootState) => state.podcasts
+);
+
   const episodes = useSelector((state: RootState) => state.episodes.byPodcast);
+  const episodeCount = selectedId ? statsByPodcast[selectedId]?.episodeCount ?? 0 : 0;
 useEffect(() => {
   dispatch(fetchFavoriteEpisodes());
 }, []);
@@ -73,16 +76,18 @@ const handleEditPodcast = () => {
       ListHeaderComponent={
         <>
           <PodcastHeader
-            coverImage={podcast.imageFile}
+            coverImage={podcast.coverImageUrl}
             title={podcast.title}
             description={podcast.description}
-            author={podcast.author ?? ""}
+            author={podcast.user?.name}
             subscriberCount={count}
+              episodeCount={episodeCount}
+
           />
           <PodcastActions
-            isOwner={podcast.userId === user?.id}
+            isOwner={podcast.user.id === user?.id}
             onAddEpisode={() =>
-              router.push(`/podcast/createEpisode?id=${selectedId}`)
+              router.push(`/studio/episode/createEpisode?id=${selectedId}`)
             }
             onEditPodcast={handleEditPodcast} // ✅ nouveau
             onSubscribe={handleSubscribePress}

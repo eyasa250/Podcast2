@@ -142,7 +142,6 @@ return { episodeId, views: typeof data === 'number' ? data : data.totalViews };
 export const addEpisodeView = createAsyncThunk(
   "episodes/addView",
   async (episodeId: number, { dispatch }) => {
-        console.log("📡 Envoi de la vue pour l'épisode", episodeId);
 
     await addView(episodeId);
     dispatch(fetchEpisodeViews(episodeId)); // Rafraîchir les vues

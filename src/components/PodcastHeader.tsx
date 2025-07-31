@@ -1,19 +1,32 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { colors } from "@/core/theme";
+const API_BASE_URL = "http://192.168.1.18:3001";
+type PodcastHeaderProps = {
+  coverImage: string;
+  title: string;
+  description: string;
+  author: string;
+  subscriberCount: number;
+  episodeCount: number; // 👈 Ajout ici
+};
 
-export function PodcastHeader({ coverImage, title, description, author, subscriberCount }: any) {
-  return (
+export function PodcastHeader({ coverImage, title, description, author, subscriberCount,episodeCount }: any) {
+   const source = coverImage
+    ? { uri: `${API_BASE_URL}${coverImage}` }
+    : require('@/assets/podcast.png');
+    return (
     <View>
       <Image
             // source={{ uri: coverImage || "https://via.placeholder.com/500" }}
  
-        source={require("@/assets/podcast.png")}
+        source={source}
         style={styles.coverImage}
         resizeMode="cover"
       />
       <View style={styles.headerContent}>
         <Text style={styles.title}>{title}</Text>
+
         <Text style={styles.subtitle}>{description}</Text>
         <Text style={styles.madeFor}>{author}</Text>
         <Text style={{ color: "#000", fontSize: 14, marginTop: 4 }}>

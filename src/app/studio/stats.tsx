@@ -1,3 +1,4 @@
+import theme from "@/core/theme";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -14,7 +15,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor:theme.colors.background,
         paddingTop: 60,  // <-- augmente ici la valeur pour plus d’espace en haut
     paddingBottom: 40, 
   },

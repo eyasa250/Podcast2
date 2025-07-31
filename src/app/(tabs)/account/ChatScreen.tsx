@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import MessageBubble from '@/components/MessageBubble';
+import theme from '@/core/theme';
 
 interface Message {
   id: string;
@@ -87,7 +88,7 @@ const [messages, setMessages] = useState<Message[]>([]);
           padding: 8,
           borderTopWidth: 1,
           borderColor: '#eee',
-          backgroundColor: '#fafafa',
+          backgroundColor: theme.colors.background,
           paddingBottom: 80,
         }}
       >
@@ -99,7 +100,7 @@ const [messages, setMessages] = useState<Message[]>([]);
             borderRadius: 20,
             paddingHorizontal: 15,
             paddingVertical: 8,
-            backgroundColor: '#fff',
+            backgroundColor:theme.colors.background,
           }}
           placeholder="Écrire un message..."
           value={input}

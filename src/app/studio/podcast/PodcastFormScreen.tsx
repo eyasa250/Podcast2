@@ -8,6 +8,7 @@ import { Image } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { addPodcast, editPodcast  } from "@/store/slices/podcastSlice";
 import { resetEditPodcast } from "@/store/slices/editPodcastSlice";
+import theme from "@/core/theme";
 
 export default function PodcastFormScreenScreen() {
     const router = useRouter();
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   input: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor:theme.colors.background,
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,

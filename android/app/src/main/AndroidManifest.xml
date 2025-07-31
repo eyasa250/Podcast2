@@ -26,7 +26,7 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="Podcast2"/>
+        <data android:scheme="podcast2"/>
         <data android:scheme="com.anonymous.Podcast2"/>
         <data android:scheme="exp+podcast2"/>
       </intent-filter>

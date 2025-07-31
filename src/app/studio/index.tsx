@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { PodcastGrid } from "@/components/PodcastGrid";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import theme from "@/core/theme";
 
 export default function StudioDashboard() {
   const router = useRouter();
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingTop: 60,  // <-- augmente ici la valeur pour plus d’espace en haut
-    paddingBottom: 40,    backgroundColor: "#f5f5f5",
+    paddingBottom: 40,    backgroundColor: theme.colors.background,
     flexGrow: 1,
   },
   title: {
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor:theme.colors.background,
     padding: 18,
     borderRadius: 12,
     marginBottom: 16,
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   summaryBox: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: theme.colors.background,
     borderRadius: 12,
     padding: 16,
     flex: 1,

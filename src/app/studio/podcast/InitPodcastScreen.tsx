@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import theme from '@/core/theme';
 
 export default function InitPodcastScreen() {
   return (
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
     width: '45%',
     padding: 20,
     borderRadius: 15,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: theme.colors.background,
     alignItems: 'center',
     elevation: 4,
   },

@@ -1,3 +1,4 @@
+import theme from "@/core/theme";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: "center",
-    backgroundColor: "#F4F6FC", // Couleur d'arrière-plan douce
+    backgroundColor: theme.colors.background, // Couleur d'arrière-plan douce
   },
   header: {
     fontSize: 28,
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 15,
-    backgroundColor: "#6200EE", // Bouton moderne avec un bleu/violet attrayant
+    backgroundColor: theme.colors.secondary, // Bouton moderne avec un bleu/violet attrayant
     paddingVertical: 12,
     borderRadius: 25,
     alignItems: "center",

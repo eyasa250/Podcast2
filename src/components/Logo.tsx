@@ -13,7 +13,7 @@ export default function Logo(): JSX.Element {
 const styles = StyleSheet.create({
   image: {
     width: 300,
-    height: 45,
+    height: 300,
     marginBottom: 8,
   },
 });

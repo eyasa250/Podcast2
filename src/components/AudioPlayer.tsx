@@ -1,5 +1,5 @@
 import { View, Image, Text, StyleSheet } from 'react-native';
-import { useActiveTrack } from 'react-native-track-player';
+import { useActiveTrack, useProgress } from 'react-native-track-player';
 import { PlayerControls } from './PlayerControls';
 import Constants from 'expo-constants';
 import { PlayerProgressBar } from './PlayerProgressbar';
@@ -8,6 +8,7 @@ const BASE_URL = Constants.expoConfig?.extra?.apiUrl;
 
 export const AudioPlayer = () => {
   const activeTrack = useActiveTrack();
+const { position } = useProgress(250); // mise à jour toutes les 250 ms
 
   if (!activeTrack) return null;
 

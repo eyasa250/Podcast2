@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getMySubscriptions } from "@/services/subscriptionApi";
 
 type PodcastsState = {
+  statsByPodcast: any;
   allpod: Podcast[];
   mine: Podcast[];
   subscriptions: Podcast[];
@@ -23,8 +24,7 @@ type PodcastsState = {
   podcastStats: PodcastStats | null;
   loading: boolean;
   error: string | null;
-  viewsByCategory: CategoryView[]; // 👈 ici
-
+  viewsByCategory: CategoryView[]; // 👈 ici7
 };
 
 const initialState: PodcastsState = {
@@ -38,7 +38,7 @@ const initialState: PodcastsState = {
   loading: false,
   error: null,
   viewsByCategory: [],
-
+statsByPodcast: {}
 };
 
 // 🔁 Récupère tous les podcasts

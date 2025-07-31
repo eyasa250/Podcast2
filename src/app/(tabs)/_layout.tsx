@@ -5,7 +5,7 @@ import { FloatingPlayerProvider } from "@/hooks/FloatingPlayerContext";
 import { FloatingPlayer } from "@/components/FloatingPlayer";
 //import { useSetupTrackPlayer } from "@/hooks/useSetupTrackPlayer";
 import { useLogTrackPlayerState } from "@/hooks/useLogTrackPlayerState";
-import { colors, fontSize } from "@/core/theme";
+import theme, { colors, fontSize } from "@/core/theme";
 import { useAuth } from "@/hooks/useAuth";
 import SessionInitializer from "@/components/SessionInitializer";
 
@@ -13,7 +13,6 @@ SplashScreen.preventAutoHideAsync();
 
 const TabsNavigation = () => {
   const { user } = useAuth();
-  const isPodcaster = user?.role === "PODCASTER";
 
 
   return (
@@ -29,7 +28,7 @@ const TabsNavigation = () => {
           },
           headerShown: true,
           headerStyle: {
-            backgroundColor: "white",
+            backgroundColor: theme.colors.background,
           },
           headerTintColor: "white",
     //    headerLeft: renderAvatar, // ✅ Ajout global basé sur auth
