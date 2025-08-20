@@ -14,7 +14,7 @@ import {
   addFavorite,
   removeFavorite,
 } from "@/services/favoritesApi";
-import { addView, getTotalEpisodeViews } from "@/services/viewApi";
+import { addView, getRecommendedEpisodes, getTotalEpisodeViews } from "@/services/viewApi";
 
 type EpisodesState = {
   byPodcast: Episode[];
@@ -23,6 +23,7 @@ type EpisodesState = {
   loading: boolean;
   error: string | null;
     viewsByEpisodeId: { [episodeId: number]: number }; // 👈 Ajouter ici
+  recommendedEpisodes: Episode[]; // 👈 ajouter ici
 
 };
 
@@ -33,6 +34,7 @@ const initialState: EpisodesState = {
   loading: false,
   error: null,
   viewsByEpisodeId: {},
+  recommendedEpisodes: [], // 👈 initialiser
 
 };
 
@@ -147,6 +149,18 @@ export const addEpisodeView = createAsyncThunk(
     dispatch(fetchEpisodeViews(episodeId)); // Rafraîchir les vues
   }
 );
+// 🔁 Récupérer les épisodes recommandés pour un utilisateur
+export const fetchRecommendedEpisodes = createAsyncThunk(
+  "episodes/fetchRecommended",
+  async (userId: number, thunkAPI) => {
+    try {
+      const data = await getRecommendedEpisodes(userId);
+      return data; // retourne la liste des épisodes recommandés
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors du chargement des épisodes recommandés");
+    }
+  }
+);
 
 const episodesSlice = createSlice({
   name: "episodes",
@@ -236,6 +250,19 @@ builder
   });
 builder
   .addCase(fetchEpisodeViews.rejected, (state, action) => {
+    state.error = action.payload as string;
+  });
+builder
+  .addCase(fetchRecommendedEpisodes.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+  .addCase(fetchRecommendedEpisodes.fulfilled, (state, action) => {
+    state.loading = false;
+    state.byPodcast = action.payload; // ou créer un champ séparé si tu veux distinguer recommandé / podcast
+  })
+  .addCase(fetchRecommendedEpisodes.rejected, (state, action) => {
+    state.loading = false;
     state.error = action.payload as string;
   });
 

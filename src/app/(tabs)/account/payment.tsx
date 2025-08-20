@@ -18,7 +18,7 @@ export default function PaymentScreen() {
   const handlePayment = async () => {
     try {
       await dispatch(upgradeRole()).unwrap(); // unwrap pour gérer les erreurs directement
-      router.replace("/podcast/InitPodcastScreen");
+      router.replace("/studio/podcast/InitPodcastScreen");
     } catch (err) {
       Alert.alert("Erreur", "Le paiement a échoué ou le rôle n'a pas pu être mis à jour.");
     }

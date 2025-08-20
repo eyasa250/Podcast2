@@ -88,5 +88,14 @@ export const fetchViewsByCategory = async (): Promise<CategoryView[]> => {
   const res = await api.get("/stats/views-by-category");
   return res.data;
 };
+export const getRecommendedPodcasts = async (userId: number) => {
+  try {
+    const response = await api.get(`/recommendation/podcasts/${userId}`);
+    console.log("📡 API Recommendation response:", response.data); // 👈 LOG
 
+    return response.data; 
+  } catch (error) {
+    console.error("❌ Erreur API getRecommendedPodcasts:", error);
+    return [];
+  }}
 export default api;

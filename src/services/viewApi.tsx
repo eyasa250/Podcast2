@@ -28,3 +28,15 @@ export const getTotalEpisodeViews = async (episodeId: number) => {
   const response = await api.get(`/view/totalepisodes/${episodeId}`);
   return response.data;
 };
+export const getRecommendedEpisodes = async (userId: number) => {
+  try {
+    const response = await api.get(`/recommendation/episodes/${userId}`);
+    console.log("📡 API Recommendation response:", response.data); // 👈 LOG
+
+    return response.data; 
+  } catch (error) {
+    console.error("❌ Erreur API getRecommendedEpisodes:", error);
+    return [];
+  }
+  
+};

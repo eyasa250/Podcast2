@@ -7,6 +7,7 @@ import {
   getAllPodcasts,
   getPodcastById,
   getPodcastsByUser,
+  getRecommendedPodcasts,
   updatePodcast,
 } from "@/services/podcastApi";
 import { CategoryView, Podcast, PodcasterStats, PodcastStats } from "@/types";
@@ -25,6 +26,8 @@ type PodcastsState = {
   loading: boolean;
   error: string | null;
   viewsByCategory: CategoryView[]; // 👈 ici7
+  recommendedPodcasts: Podcast[]; // 👈 ajouter ici
+
 };
 
 const initialState: PodcastsState = {
@@ -38,7 +41,9 @@ const initialState: PodcastsState = {
   loading: false,
   error: null,
   viewsByCategory: [],
-statsByPodcast: {}
+statsByPodcast: {},
+  recommendedPodcasts: [], // 👈 initialiser
+
 };
 
 // 🔁 Récupère tous les podcasts
@@ -107,6 +112,20 @@ export const fetchViewsByCategoryThunk = createAsyncThunk<
   }
 });
 
+export const fetchRecommendedPodcasts = createAsyncThunk(
+  "podcasts/fetchRecommended",
+  async (userId: number, thunkAPI) => {
+    try {
+      const data = await getRecommendedPodcasts(userId);
+      // 🔥 transformer pour renvoyer uniquement la liste des podcasts
+            console.log("recommend:",data.podcasts.map((item: any) => item.podcast))
+
+      return data.podcasts.map((item: any) => item.podcast);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors du chargement des podcasts recommandés");
+    }
+  }
+);
 
 const podcastsSlice = createSlice({
   name: "podcasts",
@@ -222,7 +241,19 @@ builder
     state.loading = false;
     state.error = action.payload as string;
   });
-
+builder
+  .addCase(fetchRecommendedPodcasts.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+builder.addCase(fetchRecommendedPodcasts.fulfilled, (state, action) => {
+  state.loading = false;
+  state.recommendedPodcasts = action.payload; // 👈 important
+})
+  .addCase(fetchRecommendedPodcasts.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.payload as string;
+  });
   },
 });
 
