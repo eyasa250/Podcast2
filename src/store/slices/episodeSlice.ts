@@ -8,6 +8,7 @@ import {
   enhanceEpisodeSound,
   generateSubtitles,
   updateEpisode,
+  getAllEpisodes,
 } from "@/services/episodeApi";
 import {
   getUserFavorites,
@@ -24,7 +25,7 @@ type EpisodesState = {
   error: string | null;
     viewsByEpisodeId: { [episodeId: number]: number }; // 👈 Ajouter ici
   recommendedEpisodes: Episode[]; // 👈 ajouter ici
-
+allEpisodes: Episode[];
 };
 
 const initialState: EpisodesState = {
@@ -35,6 +36,7 @@ const initialState: EpisodesState = {
   error: null,
   viewsByEpisodeId: {},
   recommendedEpisodes: [], // 👈 initialiser
+  allEpisodes: [],
 
 };
 
@@ -161,7 +163,17 @@ export const fetchRecommendedEpisodes = createAsyncThunk(
     }
   }
 );
-
+export const fetchAllEpisodes = createAsyncThunk(
+  "episodes/fetchAll",
+  async (_, thunkAPI) => {
+    try {
+      const data = await getAllEpisodes();
+      return data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue("Erreur lors du chargement des épisodes");
+    }
+  }
+);
 const episodesSlice = createSlice({
   name: "episodes",
   initialState,
@@ -265,7 +277,19 @@ builder
     state.loading = false;
     state.error = action.payload as string;
   });
-
+builder
+      .addCase(fetchAllEpisodes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllEpisodes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allEpisodes = action.payload;
+      })
+      .addCase(fetchAllEpisodes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 

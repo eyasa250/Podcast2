@@ -1,3 +1,4 @@
+import { Episode } from "@/types";
 import axios from "axios";
 
 
@@ -24,6 +25,19 @@ export const uploadEpisode = async (podcastId: string, formData: FormData) => {
 };
 
 
+export const getAllEpisodes = async (): Promise<Episode[]> => {
+  try {
+    const response = await api.get(`/episodes/allEpisodes`); // endpoint correct
+    return response.data; // ✅ sans les parenthèses
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Erreur récupération épisode:", error.response?.data || error.message);
+    } else {
+      console.error("Erreur inconnue:", error);
+    }
+    throw error;
+  }
+};
 
 export const getEpisodById = async (id: number) => {
   try {
@@ -85,5 +99,15 @@ export const getEpisodesByPodcastId = async (podcastId: string | number) => {
 
   return response.data;
 };
+// 🔎 Recherche par tag
+export const searchByTag = async (tag: string) => {
+  const res = await api.get(`/search/tag/${tag}`);
+  return res.data;
+};
 
+// 🔎 Recherche par description
+export const searchByDescription = async (description: string) => {
+  const res = await api.post(`/search/description`, { description });
+  return res.data;
+};
 export default api;
